@@ -1,17 +1,21 @@
-# StudyHub - 100% Free with Groq
+# StudyHub - AI Powered Learning Platform
 
-## Setup (No Credit Card Required)
+## Setup Instructions
 
-### 1. Get Free Groq API Key
-- Go to: https://console.groq.com/keys
-- Sign up with email (free, no payment)
-- Create API key
-- Copy the key
+### 1. Get FREE Groq API Key (No Credit Card Required)
+1. Go to: https://console.groq.com/keys
+2. Sign up with email (completely free)
+3. Create API key (starts with `gsk_...`)
+4. Copy the key
 
-### 2. Add to Vercel
-- Project Settings → Environment Variables
-- Name: `GROQ_API_KEY`
-- Value: your_groq_key (starts with gsk_...)
+### 2. Add Environment Variable to Vercel
+1. Go to your Vercel dashboard
+2. Select your project
+3. Go to **Settings** → **Environment Variables**
+4. Add:
+   - **Name:** `GROQ_API_KEY`
+   - **Value:** your_groq_api_key_here
+5. Click **Save**
 
 ### 3. Deploy
 ```bash
