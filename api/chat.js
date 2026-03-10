@@ -1,4 +1,5 @@
 module.exports = async (req, res) => {
+  // CORS headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -14,13 +15,13 @@ module.exports = async (req, res) => {
   }
 
   try {
-    const { messages, temperature = 0.7 } = req.body;
+    const { messages, temperature = 0.7, max_tokens = 1000 } = req.body;
 
     if (!messages || !Array.isArray(messages)) {
       return res.status(400).json({ error: 'Messages array required' });
     }
 
-    // GROQ - Updated to current working model
+    // Call Groq API (FREE - no credits needed)
     const response = await fetch('https://api.groq.com/openai/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -28,24 +29,35 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'llama-3.1-8b-instant',  // Updated model
+        model: 'llama-3.1-8b-instant',
         messages: messages,
         temperature: temperature,
-        max_tokens: 1000
+        max_tokens: max_tokens
       })
     });
 
     if (!response.ok) {
       const errorData = await response.json();
+      console.error('Groq API Error:', errorData);
       return res.status(response.status).json({ 
-        error: errorData.error?.message || 'API error'
+        error: errorData.error?.message || 'API error',
+        details: errorData
       });
     }
 
     const data = await response.json();
-    return res.status(200).json(data);
+    
+    // Return in format frontend expects
+    return res.status(200).json({
+      text: data.choices[0].message.content,
+      choices: data.choices
+    });
 
   } catch (error) {
-    return res.status(500).json({ error: 'Server error', message: error.message });
+    console.error('Server Error:', error);
+    return res.status(500).json({ 
+      error: 'Internal server error', 
+      message: error.message 
+    });
   }
 };
