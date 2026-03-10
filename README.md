@@ -1,14 +1,18 @@
-# StudyHub
+# StudyHub - 100% Free with Groq
 
-## Setup
+## Setup (No Credit Card Required)
 
-1. Add environment variable in Vercel dashboard:
-   - Name: `OPENROUTER_API_KEY`
-   - Value: your free api key
+### 1. Get Free Groq API Key
+- Go to: https://console.groq.com/keys
+- Sign up with email (free, no payment)
+- Create API key
+- Copy the key
 
-2. Deploy
+### 2. Add to Vercel
+- Project Settings → Environment Variables
+- Name: `GROQ_API_KEY`
+- Value: your_groq_key (starts with gsk_...)
 
-## File Structure
-- `api/chat.js` - Backend API (secure)
-- `public/index.html` - Frontend
-- `vercel.json` - Config
+### 3. Deploy
+```bash
+vercel --prod
