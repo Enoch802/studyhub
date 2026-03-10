@@ -1,44 +1,52 @@
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
+  res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
 
-  if (req.method === 'OPTIONS') return res.status(200).end();
-  if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method === 'OPTIONS') {
+    res.status(200).end();
+    return;
+  }
 
-  const { messages, max_tokens = 2000 } = req.body;
-
-  if (!messages || !Array.isArray(messages)) {
-    return res.status(400).json({ error: 'Invalid request: messages array required' });
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
+    const { messages, temperature = 0.7, max_tokens = 1000 } = req.body;
+
+    if (!messages || !Array.isArray(messages)) {
+      return res.status(400).json({ error: 'Messages array required' });
+    }
+
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${process.env.OPENROUTER_API_KEY}`,
         'Content-Type': 'application/json',
-        'HTTP-Referer': process.env.SITE_URL || 'https://studyhub.vercel.app',
-        'X-Title': 'StudyHub',
+        'HTTP-Referer': req.headers.origin || 'https://studyhub.vercel.app',
+        'X-Title': 'StudyHub'
       },
       body: JSON.stringify({
         model: 'anthropic/claude-3.5-sonnet',
-        max_tokens,
-        messages,
-      }),
+        messages: messages,
+        temperature: temperature,
+        max_tokens: max_tokens
+      })
     });
 
     if (!response.ok) {
-      const error = await response.json().catch(() => ({}));
-      return res.status(response.status).json({ error: error.error?.message || 'OpenRouter API error' });
+      const errorData = await response.json();
+      return res.status(response.status).json({ 
+        error: errorData.error?.message || 'OpenRouter API error'
+      });
     }
 
     const data = await response.json();
-    const text = data.choices?.[0]?.message?.content || '';
-    return res.status(200).json({ text });
+    return res.status(200).json(data);
 
-  } catch (err) {
-    console.error('API error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+  } catch (error) {
+    return res.status(500).json({ error: 'Internal server error', message: error.message });
   }
-}
+};
