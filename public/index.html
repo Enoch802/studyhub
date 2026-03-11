@@ -28,7 +28,7 @@
     apiKey: "AIzaSyBioZFtI6G-wzOHb0ljj3RVP_DDIfqkKwk",
     authDomain: "studyhub-87ac9.firebaseapp.com",
     projectId: "studyhub-87ac9",
-    storageBucket: "studyhub-87ac9.firebasestorage.app", // not used but kept for compatibility
+    storageBucket: "studyhub-87ac9.firebasestorage.app",
     messagingSenderId: "105165121582",
     appId: "1:105165121582:web:eb4a4780b8470cce0857bf"
   };
@@ -714,7 +714,7 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// AI — calls /api/chat (fixed undefined text error)
+// AI — calls /api/chat
 // ═══════════════════════════════════════════════════════════
 window.callAI = async function(messages, max_tokens = 2000) {
   const res = await fetch('/api/chat', {
@@ -739,6 +739,8 @@ window.callAI = async function(messages, max_tokens = 2000) {
 let currentUser = null, userProfile = {};
 let courses = [], notes = [], testHistory = [];
 let uploadCourseId = null, selectedFile = null;
+let currentCourseId = null;   // ← added missing global
+let currentNoteId = null;
 let currentTest = null, testQIdx = 0;
 let chatHistory = [];
 
@@ -950,7 +952,7 @@ window.deleteCourse = async function(id) {
 };
 
 // ═══════════════════════════════════════════════════════════
-// NOTES / UPLOAD (with Cloudinary and error handling)
+// NOTES / UPLOAD (with Cloudinary and fixed callback)
 // ═══════════════════════════════════════════════════════════
 window.openUpload = function(courseId, courseName) {
   uploadCourseId = courseId;
@@ -1006,6 +1008,10 @@ window.saveNote = async function() {
 
   if (!textVal && !hasFile) return toast('Provide note content or upload a file.', '⚠️');
 
+  // Capture current values for use inside callback (fixes undefined currentCourseId)
+  const targetCourseId = uploadCourseId;
+  const currentViewCourseId = currentCourseId;
+
   if (hasFile) {
     const file = fileInput.files[0];
 
@@ -1017,7 +1023,7 @@ window.saveNote = async function() {
       uploadPreset: UPLOAD_PRESET,
       sources: ['local'],
       multiple: false,
-      maxFileSize: 10000000, // 10 MB
+      maxFileSize: 10000000,
       resourceType: 'auto',
       folder: 'studyhub/notes'
     }, async (error, result) => {
@@ -1028,7 +1034,7 @@ window.saveNote = async function() {
 
         const noteData = {
           uid: uid(),
-          courseId: uploadCourseId,
+          courseId: targetCourseId,
           title: title,
           content: textVal || `[File: ${fileName}]`,
           fileType: fileType,
@@ -1045,7 +1051,14 @@ window.saveNote = async function() {
           hideLoading();
           updateStats();
           toast('Note saved! ✓');
-          if (currentCourseId) showCourseDetail(currentCourseId);
+          // Return to appropriate course view
+          if (currentViewCourseId) {
+            showCourseDetail(currentViewCourseId);
+          } else if (targetCourseId) {
+            showCourseDetail(targetCourseId);
+          } else {
+            showCourseGrid();
+          }
         } catch (err) {
           console.error('Error saving note to Firestore:', err);
           hideLoading();
@@ -1061,7 +1074,7 @@ window.saveNote = async function() {
     // Text‑only note
     const noteData = {
       uid: uid(),
-      courseId: uploadCourseId,
+      courseId: targetCourseId,
       title: title,
       content: textVal,
       fileType: 'text',
@@ -1077,7 +1090,13 @@ window.saveNote = async function() {
       hideLoading();
       updateStats();
       toast('Note saved! ✓');
-      if (currentCourseId) showCourseDetail(currentCourseId);
+      if (currentViewCourseId) {
+        showCourseDetail(currentViewCourseId);
+      } else if (targetCourseId) {
+        showCourseDetail(targetCourseId);
+      } else {
+        showCourseGrid();
+      }
     } catch (err) {
       console.error('Error saving note to Firestore:', err);
       hideLoading();
@@ -1255,7 +1274,6 @@ function renderInsights(d) {
 // ═══════════════════════════════════════════════════════════
 // TESTS (unchanged)
 // ═══════════════════════════════════════════════════════════
-// ... (keep all your existing test functions)
 function populateTestCourses() {
   const sel = document.getElementById('test-course');
   sel.innerHTML = '<option value="">Choose a course…</option>';
@@ -1353,7 +1371,7 @@ window.resetTest = function() { currentTest = null; testQIdx = 0; showTestPanel(
 function showTestPanel(id) { ['test-setup', 'test-active', 'test-results'].forEach(p => document.getElementById(p).style.display = 'none'); document.getElementById(id).style.display = ''; }
 
 // ═══════════════════════════════════════════════════════════
-// PROFILE (unchanged)
+// PROFILE
 // ═══════════════════════════════════════════════════════════
 function fillProfile() {
   document.getElementById('p-name').value   = userProfile.name || currentUser.displayName || '';
@@ -1431,7 +1449,7 @@ window.toggleTheme = function() {
 })();
 
 // ═══════════════════════════════════════════════════════════
-// MOTIVATIONAL QUOTES (unchanged)
+// MOTIVATIONAL QUOTES
 // ═══════════════════════════════════════════════════════════
 const QUOTES = [
   {text:"The beautiful thing about learning is that no one can take it away from you.", author:"B.B. King"},
@@ -1479,7 +1497,7 @@ window.togglePass = function(inputId, iconId) {
 };
 
 // ═══════════════════════════════════════════════════════════
-// WORD SCRAMBLE (unchanged)
+// WORD SCRAMBLE
 // ═══════════════════════════════════════════════════════════
 let wsWords = [], wsCurrentIdx = 0, wsCurrentWord = '', wsScrambled = [], wsAnswer = [], wsAttempts = 0, wsScore = 0, wsCorrect = 0;
 const WS_MAX_ATTEMPTS = 3, WS_MAX_WORDS = 10;
@@ -1651,7 +1669,7 @@ function wsFinish() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// NOTE READER with file open button (unchanged)
+// NOTE READER with file open button
 // ═══════════════════════════════════════════════════════════
 window.openNoteReader = function(noteId) {
   currentNoteId = noteId;
@@ -1690,7 +1708,7 @@ window.openNoteReader = function(noteId) {
   document.getElementById('main-content').scrollTop = 0;
 };
 
-// Helper for formatting note content (unchanged)
+// Helper for formatting note content
 function formatNoteContent(text) {
   if (!text) return '';
   var s = text
