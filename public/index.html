@@ -54,7 +54,6 @@
 </script>
 
 <style>
-  /* ── Design Tokens ─────────────────────────────────────── */
   :root {
     --bg:#07090e; --surface:#0f1218; --surface2:#161c26;
     --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.11);
@@ -75,27 +74,22 @@
     --shadow:0 4px 20px rgba(0,0,0,0.08);
   }
 
-  /* ── Reset ─────────────────────────────────────────────── */
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6;letter-spacing:-0.01em;-webkit-font-smoothing:antialiased;}
 
-  /* ── Typography ────────────────────────────────────────── */
   h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-0.02em;line-height:1.25;}
   h2{font-size:1.6rem;}
   h3{font-size:1.2rem;}
   p{color:var(--text2);}
   .label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
 
-  /* ── Gradient Text ──────────────────────────────────────── */
   .grad-text{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 
-  /* ── Cards ─────────────────────────────────────────────── */
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);transition:border-color .2s;}
   .card:hover{border-color:var(--border2);}
   .card2{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);}
   .glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(16px);border:1px solid var(--border);}
 
-  /* ── Inputs ─────────────────────────────────────────────── */
   input,select,textarea{
     background:var(--surface2);border:1px solid var(--border);color:var(--text);
     border-radius:var(--radius-sm);padding:11px 15px;
@@ -108,7 +102,6 @@
   body.light input,body.light select,body.light textarea{background:var(--surface2);color:var(--text);}
   body.light select option{background:var(--surface);}
 
-  /* ── Buttons ────────────────────────────────────────────── */
   .btn-primary{
     background:linear-gradient(135deg,var(--accent),var(--accent2));
     color:#fff;border:none;border-radius:var(--radius-sm);
@@ -131,7 +124,6 @@
   .btn-icon{background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer;font-size:13px;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
   .btn-icon:hover{background:var(--surface2);border-color:var(--border2);color:var(--text);}
 
-  /* ── Navigation ─────────────────────────────────────────── */
   .nav{
     position:fixed;top:0;left:0;right:0;z-index:100;height:58px;
     display:flex;align-items:center;padding:0 28px;
@@ -141,7 +133,6 @@
   body.light .nav{background:rgba(245,247,252,0.9);}
   .logo{font-family:var(--font-display);font-size:20px;font-weight:700;cursor:pointer;letter-spacing:-0.03em;}
 
-  /* ── Sidebar ────────────────────────────────────────────── */
   .sidebar{
     width:216px;background:var(--surface);border-right:1px solid var(--border);
     display:flex;flex-direction:column;padding:18px 10px;gap:2px;
@@ -154,7 +145,6 @@
   .sidebar-overlay.show{display:block;}
   .main-content{flex:1;overflow-y:auto;padding:32px;background:var(--bg);}
 
-  /* ── Hamburger ──────────────────────────────────────────── */
   .three-dots-btn{display:flex;flex-direction:column;gap:4.5px;padding:8px;cursor:pointer;background:transparent;border:none;border-radius:var(--radius-sm);transition:background .2s;}
   .three-dots-btn:hover{background:var(--surface2);}
   .three-dots-btn span{display:block;width:18px;height:1.5px;background:var(--text);border-radius:2px;transition:all .28s cubic-bezier(.4,0,.2,1);}
@@ -162,7 +152,6 @@
   .three-dots-btn.open span:nth-child(2){opacity:0;transform:scaleX(0);}
   .three-dots-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
 
-  /* ── Nav Buttons ────────────────────────────────────────── */
   .nav-btn{
     display:flex;align-items:center;gap:9px;padding:9px 13px;
     border-radius:var(--radius-sm);border:none;background:transparent;
@@ -174,7 +163,6 @@
   .nav-btn i{width:15px;text-align:center;font-size:13px;}
   .sidebar-section-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:14px 13px 6px;}
 
-  /* ── Auth Screen ────────────────────────────────────────── */
   .auth-bg{
     min-height:100vh;display:flex;align-items:center;justify-content:center;
     background:
@@ -184,55 +172,43 @@
   }
   body.light .auth-bg{background:radial-gradient(ellipse 70% 60% at 10% 50%,rgba(61,127,255,0.07) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 90% 20%,rgba(139,92,246,0.05) 0%,transparent 60%),var(--bg);}
 
-  /* ── Theme Button ───────────────────────────────────────── */
   .theme-btn{background:transparent;border:1px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:7px 10px;cursor:pointer;font-size:15px;transition:background .2s;line-height:1;display:inline-flex;align-items:center;}
   .theme-btn:hover{background:var(--surface2);}
 
-  /* ── Scrollbar ──────────────────────────────────────────── */
   ::-webkit-scrollbar{width:4px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
-  /* ── Chat Bubbles ───────────────────────────────────────── */
   .chat-user{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:10px 15px;border-radius:16px 16px 4px 16px;max-width:75%;font-size:13.5px;line-height:1.55;font-weight:400;}
   .chat-ai{background:var(--surface2);border:1px solid var(--border);padding:11px 15px;border-radius:4px 16px 16px 16px;max-width:86%;font-size:13.5px;line-height:1.65;}
 
-  /* ── BrainX Logo (SVG inline icon) ─────────────────────── */
   .brainx-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 12px rgba(61,127,255,0.3);}
 
-  /* ── Drop Zone ──────────────────────────────────────────── */
   .drop-zone{border:1.5px dashed var(--border2);border-radius:var(--radius);padding:40px;text-align:center;transition:all .2s;cursor:pointer;}
   .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(61,127,255,0.04);}
 
-  /* ── Toast ──────────────────────────────────────────────── */
   #toast{position:fixed;bottom:24px;right:24px;z-index:9999;transition:all .3s cubic-bezier(.4,0,.2,1);transform:translateY(80px);opacity:0;}
   #toast.show{transform:translateY(0);opacity:1;}
 
-  /* ── Modals ─────────────────────────────────────────────── */
   .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
   .modal-bg.open{display:flex;}
 
-  /* ── Progress ───────────────────────────────────────────── */
   .prog-bar{height:2px;background:var(--surface2);border-radius:2px;overflow:hidden;}
   .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .3s;}
 
-  /* ── Typing Dots ────────────────────────────────────────── */
   .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite;}
   .dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
   @keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-4px);}}
 
-  /* ── Page Transitions ───────────────────────────────────── */
   .fade{animation:fadeUp .25s ease;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
-  /* ── Insight & Badge ────────────────────────────────────── */
   .insight-card{border-left:2px solid var(--accent);}
   .star-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11.5px;font-weight:600;}
   .opt-label{display:flex;align-items:center;gap:12px;padding:12px 15px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;}
   .opt-label:hover{border-color:var(--accent);background:rgba(61,127,255,0.05);}
   .opt-label.selected{border-color:var(--accent);background:rgba(61,127,255,0.09);}
 
-  /* ── Word Scramble Game ─────────────────────────────────── */
   .ws-letter{
     display:inline-flex;align-items:center;justify-content:center;
     width:44px;height:52px;
@@ -258,7 +234,6 @@
   @keyframes pop{0%{transform:scale(1);}50%{transform:scale(1.15);}100%{transform:scale(1);}}
   .ws-letter.pop{animation:pop .25s ease;}
 
-  /* ── Misc ───────────────────────────────────────────────── */
   @keyframes spin{to{transform:rotate(360deg);}}
   #auth-quote,#auth-quote-author{transition:opacity .35s ease;}
   .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
@@ -452,13 +427,13 @@
         </div>
       </section>
 
-      <!-- BRAINX CHAT -->
+      <!-- BRAINX CHAT (minimal) -->
       <section id="sec-brainx" style="display:none;position:fixed;top:60px;left:0;right:0;bottom:0;z-index:50;background:var(--bg);padding:0;" class="fade">
         <div style="display:grid;grid-template-columns:1fr 300px;height:100%;">
           <div style="display:flex;flex-direction:column;overflow:hidden;border-right:1px solid var(--border);">
             <div style="padding:16px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;background:var(--surface);">
               <div class="brainx-avatar">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
                   <path d="M12 2C9.5 2 7.5 3.5 6.5 5.5C5 5.8 3.5 7 3.5 8.8C2.5 9.4 2 10.5 2 11.5C2 13 3 14.2 4.5 14.7C4.5 15 4.5 15.3 4.6 15.5C4.3 15.9 4.2 16.4 4.2 17C4.2 18.5 5.4 19.7 6.9 19.8C7.5 20.6 8.5 21 9.5 21H14.5C15.5 21 16.5 20.6 17.1 19.8C18.6 19.7 19.8 18.5 19.8 17C19.8 16.4 19.7 15.9 19.4 15.5C19.5 15.3 19.5 15 19.5 14.7C21 14.2 22 13 22 11.5C22 10.5 21.5 9.4 20.5 8.8C20.5 7 19 5.8 17.5 5.5C16.5 3.5 14.5 2 12 2Z" fill="rgba(255,255,255,0.9)"/>
                   <circle cx="9" cy="11" r="1.2" fill="rgba(61,127,255,0.8)"/>
                   <circle cx="15" cy="11" r="1.2" fill="rgba(61,127,255,0.8)"/>
@@ -467,7 +442,7 @@
               </div>
               <div style="flex:1;">
                 <div style="font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:-0.02em;">BrainX</div>
-                <div style="font-size:11px;color:var(--green);letter-spacing:0.02em;">● Online · AI Study Assistant</div>
+                <div style="font-size:11px;color:var(--green);">● Online · AI Study Assistant</div>
               </div>
               <button onclick="window.showSection('overview')" class="btn-icon">
                 <i class="fas fa-times" style="font-size:12px;"></i> Close
@@ -747,9 +722,9 @@
 </div>
 
 <script>
-// ═══════════════════════════════════════════════════════════
-// AI — calls /api/chat
-// ═══════════════════════════════════════════════════════════
+// ============================================================
+// AI – calls /api/chat
+// ============================================================
 window.callAI = async function(messages, max_tokens = 2000) {
   const res = await fetch('/api/chat', {
     method: 'POST',
@@ -767,9 +742,9 @@ window.callAI = async function(messages, max_tokens = 2000) {
   return data.text;
 };
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // STATE
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 let currentUser = null, userProfile = {};
 let courses = [], notes = [], testHistory = [];
 let uploadCourseId = null, selectedFile = null;
@@ -778,9 +753,9 @@ let currentNoteId = null;
 let currentTest = null, testQIdx = 0;
 let chatHistory = [];
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // FIREBASE INIT
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 function waitForFB(cb) {
   if (window._fbReady) return cb();
   window.addEventListener('fb-ready', cb, { once: true });
@@ -794,9 +769,9 @@ waitForFB(() => {
   });
 });
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // AUTH
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 window.authTab = function(tab) {
   document.getElementById('form-login').style.display  = tab==='login'  ? 'block' : 'none';
   document.getElementById('form-signup').style.display = tab==='signup' ? 'block' : 'none';
@@ -813,7 +788,6 @@ window.doLogin = async function() {
   try {
     showLoading('Logging in…');
     await window._fbFns.signInWithEmailAndPassword(window._auth, email, pass);
-    // hideLoading is called inside showApp or on error
   } catch(e) {
     hideLoading();
     showErr(err, friendlyErr(e.code));
@@ -838,7 +812,6 @@ window.doSignup = async function() {
     const cred = await createUserWithEmailAndPassword(window._auth, email, pass);
     await updateProfile(cred.user, { displayName: name });
     await setDoc(doc(window._db,'users',cred.user.uid), { name, email, school, dept, createdAt: Date.now() });
-    // hideLoading will be called when auth state changes to logged in
   } catch(e) {
     hideLoading();
     showErr(err, friendlyErr(e.code));
@@ -860,9 +833,9 @@ function friendlyErr(code){
   return 'Error: '+code;
 }
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // FIRESTORE HELPERS
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 const uid = () => currentUser.uid;
 async function fsSet(path,data){ const {doc,setDoc}=window._fbFns; await setDoc(doc(window._db,path),data); }
 async function fsAdd(col,data){ const {collection,addDoc}=window._fbFns; const r=await addDoc(collection(window._db,col),data); return r.id; }
@@ -870,9 +843,9 @@ async function fsGet(path){ const {doc,getDoc}=window._fbFns; const s=await getD
 async function fsQuery(col,field,op,val){ const {collection,query,where,getDocs}=window._fbFns; const q=query(collection(window._db,col),where(field,op,val)); const s=await getDocs(q); return s.docs.map(d=>({id:d.id,...d.data()})); }
 async function fsDel(path){ const {doc,deleteDoc}=window._fbFns; await deleteDoc(doc(window._db,path)); }
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // LOAD DATA
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 async function loadUserData() {
   userProfile = await fsGet(`users/${uid()}`) || { name: currentUser.displayName, email: currentUser.email };
   courses     = await fsQuery('courses','uid','==',uid());
@@ -880,9 +853,9 @@ async function loadUserData() {
   testHistory = await fsQuery('tests',  'uid','==',uid());
 }
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // SCREENS
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 function showAuthScreen() {
   hideLoading();
   document.getElementById('auth-screen').style.display='flex';
@@ -945,9 +918,9 @@ function updateStats() {
   document.getElementById('stat-tests').textContent   = testHistory.length;
 }
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // UTILITIES
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 window.showLoading = function(msg = 'Loading…') {
   document.getElementById('load-text').textContent = msg;
   document.getElementById('loading-overlay').style.display = 'flex';
@@ -982,9 +955,9 @@ function fmtAI(text) {
     .replace(/\n/g, '<br>');
 }
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // COURSES
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 window.showCourseGrid = function() {
   const gridEl = document.getElementById('view-courses-grid');
   const detailEl = document.getElementById('view-course-detail');
@@ -1103,9 +1076,9 @@ window.deleteNoteAndBack = async function(noteId) {
   }
 };
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // NOTES / UPLOAD (direct Cloudinary upload)
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 window.openUpload = function(courseId, courseName) {
   uploadCourseId = courseId;
   document.getElementById('upload-course-name').textContent = courseName;
@@ -1268,9 +1241,9 @@ window.deleteNote = async function(id) {
   }
 };
 
-// ═══════════════════════════════════════════════════════════
-// BRAINX CHAT (minimal implementation)
-// ═══════════════════════════════════════════════════════════
+// ============================================================
+// BRAINX CHAT (minimal)
+// ============================================================
 function loadChatNotes() {
   const con = document.getElementById('chat-notes');
   if (!notes.length) { con.innerHTML = '<p style="font-size:13px;color:var(--muted);padding:8px;">No notes yet.</p>'; return; }
@@ -1330,9 +1303,9 @@ function appendTyping() {
   con.appendChild(d); con.scrollTop = con.scrollHeight; return d;
 }
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // BRAINX INSIGHTS (minimal)
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 window.insTab = function(tab) {
   document.getElementById('ins-paste-area').style.display = tab === 'paste' ? 'block' : 'none';
   document.getElementById('ins-note-area').style.display  = tab === 'note'  ? 'block' : 'none';
@@ -1393,9 +1366,9 @@ function renderInsights(d) {
   ].join('');
 }
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // TESTS (minimal)
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 function populateTestCourses() {
   const sel = document.getElementById('test-course');
   sel.innerHTML = '<option value="">Choose a course…</option>';
@@ -1492,9 +1465,9 @@ window.resetTest = function() { currentTest = null; testQIdx = 0; showTestPanel(
 
 function showTestPanel(id) { ['test-setup', 'test-active', 'test-results'].forEach(p => document.getElementById(p).style.display = 'none'); document.getElementById(id).style.display = ''; }
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // PROFILE
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 function fillProfile() {
   document.getElementById('p-name').value   = userProfile.name || currentUser.displayName || '';
   document.getElementById('p-email').value  = currentUser.email || '';
@@ -1517,16 +1490,16 @@ window.saveProfile = async function() {
   hideLoading(); toast('Profile saved! ✓');
 };
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // MODALS
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 window.openModal = function(id) { document.getElementById(id).classList.add('open'); };
 window.closeModal = function(id) { document.getElementById(id).classList.remove('open'); };
 document.querySelectorAll('.modal-bg').forEach(m => m.addEventListener('click', e => { if (e.target === m) m.classList.remove('open'); }));
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // THEME TOGGLE
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 window.toggleTheme = function() {
   const isLight = document.body.classList.toggle('light');
   const icon = isLight ? '☀️' : '🌙';
@@ -1544,9 +1517,9 @@ window.toggleTheme = function() {
   }
 })();
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // MOTIVATIONAL QUOTES
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 const QUOTES = [
   {text:"The beautiful thing about learning is that no one can take it away from you.", author:"B.B. King"},
   {text:"Education is the most powerful weapon which you can use to change the world.", author:"Nelson Mandela"},
@@ -1577,9 +1550,9 @@ function rotateQuote() {
 })();
 setInterval(rotateQuote, 9000);
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // PASSWORD VISIBILITY TOGGLE
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 window.togglePass = function(inputId, iconId) {
   const input = document.getElementById(inputId);
   const icon = document.getElementById(iconId);
@@ -1592,9 +1565,9 @@ window.togglePass = function(inputId, iconId) {
   }
 };
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // WORD SCRAMBLE (minimal)
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 let wsWords = [], wsCurrentIdx = 0, wsCurrentWord = '', wsScrambled = [], wsAnswer = [], wsAttempts = 0, wsScore = 0, wsCorrect = 0;
 const WS_MAX_ATTEMPTS = 3, WS_MAX_WORDS = 10;
 
@@ -1764,20 +1737,20 @@ function wsFinish() {
   document.getElementById('ws-final-score').textContent = wsScore + ' pts';
 }
 
-// ═══════════════════════════════════════════════════════════
-// NOTE READER with direct file opening for file‑only notes
-// ═══════════════════════════════════════════════════════════
+// ============================================================
+// NOTE READER – direct file opening for file‑only notes
+// ============================================================
 window.openNoteReader = function(noteId) {
   const n = notes.find(x => x.id === noteId);
   if (!n) return;
 
-  // If it's a file‑only note (no pasted text), open the file directly
+  // If it's a file‑only note (no pasted text), open directly in new tab
   if (n.fileURL && (!n.content || n.content.startsWith('[File:'))) {
     window.open(n.fileURL, '_blank');
     return;
   }
 
-  // Otherwise, show the note reader with text and file button
+  // Otherwise show the reader with text and file button
   currentNoteId = noteId;
   const c = courses.find(x => x.id === n.courseId);
 
@@ -1833,9 +1806,9 @@ function formatNoteContent(text) {
   return '<p style="color:var(--text2);margin-bottom:12px;">' + s + '</p>';
 }
 
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 // Initialization
-// ═══════════════════════════════════════════════════════════
+// ============================================================
 window.insTab('paste');
 </script>
 </body>
