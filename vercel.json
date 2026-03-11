@@ -19,13 +19,5 @@
       "src": "/(.*)",
       "dest": "/public/$1"
     }
-  ],
-  "env": {
-    "GROQ_API_KEY": "@groq_api_key"
-  },
-  "functions": {
-    "api/chat.js": {
-      "maxDuration": 30
-    }
-  }
+  ]
 }
