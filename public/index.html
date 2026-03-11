@@ -28,7 +28,7 @@
     apiKey: "AIzaSyBioZFtI6G-wzOHb0ljj3RVP_DDIfqkKwk",
     authDomain: "studyhub-87ac9.firebaseapp.com",
     projectId: "studyhub-87ac9",
-    storageBucket: "studyhub-87ac9.firebasestorage.app", // kept for compatibility, not used
+    storageBucket: "studyhub-87ac9.firebasestorage.app", // not used but kept for compatibility
     messagingSenderId: "105165121582",
     appId: "1:105165121582:web:eb4a4780b8470cce0857bf"
   };
@@ -714,7 +714,7 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// AI — calls /api/chat
+// AI — calls /api/chat (fixed undefined text error)
 // ═══════════════════════════════════════════════════════════
 window.callAI = async function(messages, max_tokens = 2000) {
   const res = await fetch('/api/chat', {
@@ -727,6 +727,9 @@ window.callAI = async function(messages, max_tokens = 2000) {
     throw new Error(e.error || `HTTP ${res.status}`);
   }
   const data = await res.json();
+  if (!data || typeof data.text === 'undefined') {
+    throw new Error('Invalid response from AI server');
+  }
   return data.text;
 };
 
@@ -947,7 +950,7 @@ window.deleteCourse = async function(id) {
 };
 
 // ═══════════════════════════════════════════════════════════
-// NOTES / UPLOAD (with Cloudinary)
+// NOTES / UPLOAD (with Cloudinary and error handling)
 // ═══════════════════════════════════════════════════════════
 window.openUpload = function(courseId, courseName) {
   uploadCourseId = courseId;
@@ -977,7 +980,6 @@ window.clearFile = function() {
   document.getElementById('file-preview').style.display = 'none';
 };
 
-// Drop zone (unchanged)
 document.addEventListener('DOMContentLoaded', function() {
   const dz = document.getElementById('drop-zone');
   if (dz) {
@@ -994,7 +996,6 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 });
 
-// Cloudinary upload (main function)
 window.saveNote = async function() {
   const title = document.getElementById('upload-note-title').value.trim();
   const textVal = document.getElementById('upload-text').value.trim();
@@ -1008,7 +1009,6 @@ window.saveNote = async function() {
   if (hasFile) {
     const file = fileInput.files[0];
 
-    // Cloudinary configuration – YOUR DETAILS HERE
     const CLOUD_NAME = 'dl0mvkewm';
     const UPLOAD_PRESET = 'studyhub_unsigned';
 
@@ -1038,13 +1038,19 @@ window.saveNote = async function() {
         };
 
         showLoading('Saving note…');
-        const id = await fsAdd('notes', noteData);
-        notes.push({ id, ...noteData });
-        closeModal('modal-upload');
-        hideLoading();
-        updateStats();
-        toast('Note saved! ✓');
-        if (currentCourseId) showCourseDetail(currentCourseId);
+        try {
+          const id = await fsAdd('notes', noteData);
+          notes.push({ id, ...noteData });
+          closeModal('modal-upload');
+          hideLoading();
+          updateStats();
+          toast('Note saved! ✓');
+          if (currentCourseId) showCourseDetail(currentCourseId);
+        } catch (err) {
+          console.error('Error saving note to Firestore:', err);
+          hideLoading();
+          toast('Failed to save note: ' + err.message, '❌');
+        }
       } else if (error) {
         console.error('Upload error:', error);
         toast('Upload failed. Try again.', '❌');
@@ -1064,13 +1070,19 @@ window.saveNote = async function() {
       createdAt: Date.now()
     };
     showLoading('Saving note…');
-    const id = await fsAdd('notes', noteData);
-    notes.push({ id, ...noteData });
-    closeModal('modal-upload');
-    hideLoading();
-    updateStats();
-    toast('Note saved! ✓');
-    if (currentCourseId) showCourseDetail(currentCourseId);
+    try {
+      const id = await fsAdd('notes', noteData);
+      notes.push({ id, ...noteData });
+      closeModal('modal-upload');
+      hideLoading();
+      updateStats();
+      toast('Note saved! ✓');
+      if (currentCourseId) showCourseDetail(currentCourseId);
+    } catch (err) {
+      console.error('Error saving note to Firestore:', err);
+      hideLoading();
+      toast('Failed to save note: ' + err.message, '❌');
+    }
   }
 };
 
@@ -1105,9 +1117,14 @@ window.renderNotes = function() {
 window.deleteNote = async function(id) {
   if (!confirm('Delete this note?')) return;
   showLoading('Deleting…');
-  await fsDel(`notes/${id}`);
-  notes = notes.filter(n => n.id !== id);
-  hideLoading(); updateStats(); renderNotes(); toast('Note deleted.');
+  try {
+    await fsDel(`notes/${id}`);
+    notes = notes.filter(n => n.id !== id);
+    hideLoading(); updateStats(); renderNotes(); toast('Note deleted.');
+  } catch (err) {
+    console.error('Error deleting note:', err);
+    hideLoading(); toast('Failed to delete note.', '❌');
+  }
 };
 
 // ═══════════════════════════════════════════════════════════
@@ -1173,7 +1190,7 @@ function appendTyping() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// BRAINX INSIGHTS
+// BRAINX INSIGHTS (unchanged)
 // ═══════════════════════════════════════════════════════════
 window.insTab = function(tab) {
   document.getElementById('ins-paste-area').style.display = tab === 'paste' ? 'block' : 'none';
@@ -1236,8 +1253,9 @@ function renderInsights(d) {
 }
 
 // ═══════════════════════════════════════════════════════════
-// TESTS
+// TESTS (unchanged)
 // ═══════════════════════════════════════════════════════════
+// ... (keep all your existing test functions)
 function populateTestCourses() {
   const sel = document.getElementById('test-course');
   sel.innerHTML = '<option value="">Choose a course…</option>';
@@ -1335,7 +1353,7 @@ window.resetTest = function() { currentTest = null; testQIdx = 0; showTestPanel(
 function showTestPanel(id) { ['test-setup', 'test-active', 'test-results'].forEach(p => document.getElementById(p).style.display = 'none'); document.getElementById(id).style.display = ''; }
 
 // ═══════════════════════════════════════════════════════════
-// PROFILE
+// PROFILE (unchanged)
 // ═══════════════════════════════════════════════════════════
 function fillProfile() {
   document.getElementById('p-name').value   = userProfile.name || currentUser.displayName || '';
@@ -1413,9 +1431,20 @@ window.toggleTheme = function() {
 })();
 
 // ═══════════════════════════════════════════════════════════
-// MOTIVATIONAL QUOTES
+// MOTIVATIONAL QUOTES (unchanged)
 // ═══════════════════════════════════════════════════════════
-const QUOTES = [ /* ... your quotes ... */ ];
+const QUOTES = [
+  {text:"The beautiful thing about learning is that no one can take it away from you.", author:"B.B. King"},
+  {text:"Education is the most powerful weapon which you can use to change the world.", author:"Nelson Mandela"},
+  {text:"The more that you read, the more things you will know.", author:"Dr. Seuss"},
+  {text:"An investment in knowledge pays the best interest.", author:"Benjamin Franklin"},
+  {text:"Live as if you were to die tomorrow. Learn as if you were to live forever.", author:"Mahatma Gandhi"},
+  {text:"The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice.", author:"Brian Herbert"},
+  {text:"Education is not the filling of a pail, but the lighting of a fire.", author:"W.B. Yeats"},
+  {text:"The expert in anything was once a beginner.", author:"Helen Hayes"},
+  {text:"Push yourself, because no one else is going to do it for you.", author:"Anonymous"},
+  {text:"Success is the sum of small efforts, repeated day in and day out.", author:"Robert Collier"},
+];
 let _quoteIdx = Math.floor(Math.random() * QUOTES.length);
 function rotateQuote() {
   _quoteIdx = (_quoteIdx + 1) % QUOTES.length;
@@ -1455,19 +1484,174 @@ window.togglePass = function(inputId, iconId) {
 let wsWords = [], wsCurrentIdx = 0, wsCurrentWord = '', wsScrambled = [], wsAnswer = [], wsAttempts = 0, wsScore = 0, wsCorrect = 0;
 const WS_MAX_ATTEMPTS = 3, WS_MAX_WORDS = 10;
 
-window.wsStart = async function() { /* ... (keep your existing wsStart code) ... */ };
-function wsLoadWord() { /* ... */ }
-function wsRenderLetters() { /* ... */ }
-function wsRenderAnswer() { /* ... */ }
-function wsPickLetter(scramIdx) { /* ... */ }
-function wsRemoveLetter(answerIdx) { /* ... */ }
-window.wsClearAnswer = function() { /* ... */ };
-window.wsSubmit = function() { /* ... */ };
-window.wsNextWord = function() { /* ... */ };
-function wsFinish() { /* ... */ }
+window.wsStart = async function() {
+  document.getElementById('ws-loading').style.display = 'block';
+  document.getElementById('ws-board').style.display = 'none';
+  document.getElementById('ws-complete').style.display = 'none';
+  document.getElementById('ws-error').style.display = 'none';
+
+  wsScore = 0; wsCorrect = 0; wsCurrentIdx = 0; wsWords = [];
+
+  try {
+    const resp = await callAI([{
+      role: 'user',
+      content: `You are BrainX. Generate exactly 10 English vocabulary words suitable for university students. Mix difficulty levels (some medium, some hard). For each word also provide a short one-sentence hint/definition.\n\nRespond ONLY with a valid JSON array, no markdown, no explanation. Format:\n[{"word":"example","hint":"A thing that serves to illustrate a point"},...]`
+    }], 800);
+
+    let parsed;
+    try {
+      const clean = resp.replace(/```json|```/g,'').trim();
+      parsed = JSON.parse(clean);
+    } catch(e) {
+      const match = resp.match(/\[[\s\S]+\]/);
+      if(match) parsed = JSON.parse(match[0]);
+      else throw new Error('Invalid JSON from AI');
+    }
+
+    wsWords = parsed.slice(0, WS_MAX_WORDS);
+    document.getElementById('ws-loading').style.display = 'none';
+    wsLoadWord();
+  } catch(e) {
+    document.getElementById('ws-loading').style.display = 'none';
+    document.getElementById('ws-error').style.display = 'block';
+  }
+};
+
+function wsLoadWord() {
+  const item = wsWords[wsCurrentIdx];
+  wsCurrentWord = item.word.toUpperCase();
+  wsAttempts = 0;
+  wsAnswer = [];
+  wsScrambled = wsCurrentWord.split('').sort(() => Math.random() - 0.5);
+  while(wsScrambled.join('') === wsCurrentWord && wsCurrentWord.length > 1) {
+    wsScrambled.sort(() => Math.random() - 0.5);
+  }
+
+  document.getElementById('ws-board').style.display = 'block';
+  document.getElementById('ws-word-num').textContent = wsCurrentIdx + 1;
+  document.getElementById('ws-attempts-left').textContent = WS_MAX_ATTEMPTS;
+  document.getElementById('ws-attempts-left').style.color = 'var(--text)';
+  document.getElementById('ws-hint').textContent = item.hint;
+  document.getElementById('ws-feedback').textContent = '';
+  document.getElementById('ws-feedback').style.color = 'var(--text)';
+  document.getElementById('ws-reveal-zone').style.display = 'none';
+  document.getElementById('ws-submit-btn').disabled = false;
+  wsRenderLetters();
+  wsRenderAnswer();
+}
+
+function wsRenderLetters() {
+  const row = document.getElementById('ws-letters-row');
+  row.innerHTML = '';
+  wsScrambled.forEach((letter, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'ws-letter' + (letter === null ? ' placed' : '');
+    btn.textContent = letter === null ? '' : letter;
+    btn.dataset.idx = i;
+    btn.disabled = letter === null;
+    btn.style.opacity = letter === null ? '0.25' : '1';
+    if(letter !== null) {
+      btn.onclick = () => wsPickLetter(i);
+    }
+    row.appendChild(btn);
+  });
+}
+
+function wsRenderAnswer() {
+  const row = document.getElementById('ws-answer-row');
+  row.innerHTML = '';
+  for(let i = 0; i < wsCurrentWord.length; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'ws-slot' + (wsAnswer[i] ? ' filled' : '');
+    slot.textContent = wsAnswer[i]?.letter || '';
+    if(wsAnswer[i]) {
+      slot.onclick = () => wsRemoveLetter(i);
+      slot.style.cursor = 'pointer';
+    }
+    row.appendChild(slot);
+  }
+}
+
+function wsPickLetter(scramIdx) {
+  if(wsAnswer.length >= wsCurrentWord.length) return;
+  const letter = wsScrambled[scramIdx];
+  if(!letter) return;
+  wsAnswer.push({letter, scramIdx});
+  wsScrambled[scramIdx] = null;
+  wsRenderLetters();
+  wsRenderAnswer();
+}
+
+function wsRemoveLetter(answerIdx) {
+  const item = wsAnswer[answerIdx];
+  if(!item) return;
+  wsScrambled[item.scramIdx] = item.letter;
+  wsAnswer.splice(answerIdx, 1);
+  wsRenderLetters();
+  wsRenderAnswer();
+}
+
+window.wsClearAnswer = function() {
+  wsAnswer.forEach(item => { if(item) wsScrambled[item.scramIdx] = item.letter; });
+  wsAnswer = [];
+  wsRenderLetters();
+  wsRenderAnswer();
+  document.getElementById('ws-feedback').textContent = '';
+};
+
+window.wsSubmit = function() {
+  if(wsAnswer.length < wsCurrentWord.length) {
+    document.getElementById('ws-feedback').textContent = 'Place all letters first.';
+    document.getElementById('ws-feedback').style.color = 'var(--muted)';
+    return;
+  }
+
+  const guess = wsAnswer.map(a => a.letter).join('');
+  wsAttempts++;
+
+  if(guess === wsCurrentWord) {
+    wsCorrect++;
+    const pts = Math.max(10, 30 - (wsAttempts - 1) * 10);
+    wsScore += pts;
+    document.getElementById('ws-score').textContent = wsScore;
+    document.getElementById('ws-feedback').textContent = wsAttempts === 1 ? `Perfect! +${pts} pts` : `Correct! +${pts} pts`;
+    document.getElementById('ws-feedback').style.color = 'var(--green)';
+    document.querySelectorAll('.ws-slot').forEach(s => { s.style.borderColor='var(--green)'; s.style.color='var(--green)'; });
+    setTimeout(() => { if(wsCurrentIdx + 1 >= wsWords.length) wsFinish(); else { wsCurrentIdx++; wsLoadWord(); } }, 1200);
+  } else {
+    const attLeft = WS_MAX_ATTEMPTS - wsAttempts;
+    document.getElementById('ws-feedback').style.color = 'var(--red)';
+    document.getElementById('ws-attempts-left').textContent = attLeft;
+    document.getElementById('ws-attempts-left').style.color = attLeft <= 1 ? 'var(--red)' : 'var(--orange)';
+
+    if(attLeft <= 0) {
+      document.getElementById('ws-feedback').textContent = 'Out of attempts.';
+      document.getElementById('ws-submit-btn').disabled = true;
+      document.getElementById('ws-answer-reveal').textContent = wsCurrentWord;
+      document.getElementById('ws-reveal-zone').style.display = 'flex';
+    } else {
+      document.getElementById('ws-feedback').textContent = `Not quite. ${attLeft} attempt${attLeft===1?'':'s'} left.`;
+      wsClearAnswer();
+    }
+  }
+};
+
+window.wsNextWord = function() {
+  wsCurrentIdx++;
+  if(wsCurrentIdx >= wsWords.length) wsFinish();
+  else wsLoadWord();
+};
+
+function wsFinish() {
+  document.getElementById('ws-board').style.display = 'none';
+  document.getElementById('ws-complete').style.display = 'block';
+  document.getElementById('ws-final-correct').textContent = wsCorrect;
+  document.getElementById('ws-final-total').textContent = wsWords.length;
+  document.getElementById('ws-final-score').textContent = wsScore + ' pts';
+}
 
 // ═══════════════════════════════════════════════════════════
-// NOTE READER with file open button
+// NOTE READER with file open button (unchanged)
 // ═══════════════════════════════════════════════════════════
 window.openNoteReader = function(noteId) {
   currentNoteId = noteId;
@@ -1505,6 +1689,25 @@ window.openNoteReader = function(noteId) {
 
   document.getElementById('main-content').scrollTop = 0;
 };
+
+// Helper for formatting note content (unchanged)
+function formatNoteContent(text) {
+  if (!text) return '';
+  var s = text
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/^### (.+)$/gm, '<h4 style="font-family:var(--font-display);font-size:16px;font-weight:700;margin:20px 0 8px;color:var(--text);">$1</h4>')
+    .replace(/^## (.+)$/gm,  '<h3 style="font-family:var(--font-display);font-size:19px;font-weight:700;margin:24px 0 10px;color:var(--text);border-bottom:1px solid var(--border);padding-bottom:8px;">$1</h3>')
+    .replace(/^# (.+)$/gm,   '<h2 style="font-family:var(--font-display);font-size:22px;font-weight:700;margin:28px 0 12px;color:var(--text);">$1</h2>')
+    .replace(/\*\*(.+?)\*\*/g, '<strong style="color:var(--text);font-weight:700;">$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em style="color:var(--text2);">$1</em>')
+    .replace(/`([^`]+)`/g, '<code style="background:var(--surface2);padding:2px 7px;border-radius:5px;font-family:var(--font-mono);font-size:12.5px;color:var(--accent);">$1</code>')
+    .replace(/^[-*] (.+)$/gm, '<li style="margin-bottom:5px;color:var(--text2);">$1</li>')
+    .replace(/^\d+\. (.+)$/gm, '<li style="margin-bottom:5px;color:var(--text2);">$1</li>')
+    .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">')
+    .replace(/\n\n/g, '</p><p style="color:var(--text2);margin-bottom:12px;">')
+    .replace(/\n/g, '<br>');
+  return '<p style="color:var(--text2);margin-bottom:12px;">' + s + '</p>';
+}
 </script>
 </body>
 </html>
