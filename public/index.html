@@ -99,7 +99,7 @@
   input::placeholder,textarea::placeholder{color:var(--muted);}
   select option{background:var(--surface2);color:var(--text);}
   body.light input,body.light select,body.light textarea{background:var(--surface2);color:var(--text);}
-  body.light select option{background:var(--surface);}
+  body.light select option{background:var(--surface);color:var(--text);}
 
   /* ── Buttons ────────────────────────────────────────────── */
   .btn-primary{
@@ -266,7 +266,7 @@
 <!-- ══════════════ AUTH SCREEN ══════════════ -->
 <div id="auth-screen" class="auth-bg">
   <!-- Theme toggle top right -->
-  <button class="theme-btn" onclick="toggleTheme()" style="position:fixed;top:16px;right:16px;z-index:999;" title="Toggle light/dark mode" id="theme-btn-auth">🌙</button>
+  <button class="theme-btn" onclick="window.toggleTheme()" style="position:fixed;top:16px;right:16px;z-index:999;" title="Toggle light/dark mode" id="theme-btn-auth">🌙</button>
 
   <div style="width:420px;max-width:100%;padding:16px;">
     <div class="text-center" style="margin-bottom:24px;">
@@ -332,7 +332,7 @@
     <div class="logo grad-text" style="margin-left:12px;">StudyHub</div>
     <div style="flex:1;"></div>
     <div style="display:flex;align-items:center;gap:10px;">
-      <button class="theme-btn" id="theme-btn-app" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
+      <button class="theme-btn" id="theme-btn-app" onclick="window.toggleTheme()" title="Toggle light/dark mode">🌙</button>
       <div id="nav-user" style="font-size:13px;color:var(--muted);"></div>
       <button class="btn-ghost" style="padding:8px 16px;font-size:13px;" onclick="doLogout()">
         <i class="fas fa-sign-out-alt"></i> Logout
@@ -897,8 +897,28 @@
 
 <script>
 // ═══════════════════════════════════════════════════════════
-// AI — calls /api/chat (Vercel backend, key never exposed)
+// Make all functions globally available
 // ═══════════════════════════════════════════════════════════
+window.toggleTheme = function() {
+  const isLight = document.body.classList.toggle('light');
+  const icon = isLight ? '☀️' : '🌙';
+  ['theme-btn-auth','theme-btn-app'].forEach(id => {
+    const b = document.getElementById(id); if(b) b.textContent = icon;
+  });
+  localStorage.setItem('sh-theme', isLight ? 'light' : 'dark');
+};
+
+// Initialize theme on load
+(function() {
+  if(localStorage.getItem('sh-theme') === 'light') {
+    document.body.classList.add('light');
+    ['theme-btn-auth','theme-btn-app'].forEach(id => {
+      const b = document.getElementById(id); if(b) b.textContent = '☀️';
+    });
+  }
+})();
+
+// AI — calls /api/chat (Vercel backend, key never exposed)
 async function callAI(messages, max_tokens = 2000, json_mode = false) {
   const res = await fetch('/api/chat', {
     method: 'POST',
@@ -940,13 +960,14 @@ waitForFB(() => {
 // ═══════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════
-function authTab(tab) {
+window.authTab = function(tab) {
   document.getElementById('form-login').style.display  = tab==='login'  ? 'block' : 'none';
   document.getElementById('form-signup').style.display = tab==='signup' ? 'block' : 'none';
   document.getElementById('tab-login').className  = tab==='login'  ? 'btn-primary' : 'btn-ghost';
   document.getElementById('tab-signup').className = tab==='signup' ? 'btn-primary' : 'btn-ghost';
-}
-async function doLogin() {
+};
+
+window.doLogin = async function() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
   const err   = document.getElementById('login-err');
@@ -956,8 +977,9 @@ async function doLogin() {
     showLoading('Logging in…');
     await window._fbFns.signInWithEmailAndPassword(window._auth, email, pass);
   } catch(e) { hideLoading(); showErr(err, friendlyErr(e.code)); }
-}
-async function doSignup() {
+};
+
+window.doSignup = async function() {
   const name=document.getElementById('su-name').value.trim(),
         email=document.getElementById('su-email').value.trim(),
         school=document.getElementById('su-school').value.trim(),
@@ -976,11 +998,13 @@ async function doSignup() {
     await updateProfile(cred.user, { displayName: name });
     await setDoc(doc(window._db,'users',cred.user.uid), { name, email, school, dept, createdAt: Date.now() });
   } catch(e) { hideLoading(); showErr(err, friendlyErr(e.code)); }
-}
-async function doLogout() {
+};
+
+window.doLogout = async function() {
   await window._fbFns.signOut(window._auth);
   currentUser=null; courses=[]; notes=[]; testHistory=[];
-}
+};
+
 function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 function friendlyErr(code){
   if(!code) return 'Something went wrong.';
@@ -1019,6 +1043,7 @@ function showAuthScreen() {
   document.getElementById('auth-screen').style.display='flex';
   document.getElementById('app').style.display='none';
 }
+
 function showApp() {
   hideLoading();
   document.getElementById('auth-screen').style.display='none';
@@ -1032,7 +1057,8 @@ function showApp() {
   updateStreak();
   showSection('overview');
 }
-function toggleSidebar() {
+
+window.toggleSidebar = function() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const btn = document.getElementById('sidebar-toggle');
@@ -1046,19 +1072,20 @@ function toggleSidebar() {
     overlay.classList.add('show');
     btn.classList.add('open');
   }
-}
-function closeSidebar() {
+};
+
+window.closeSidebar = function() {
   document.getElementById('sidebar').classList.add('collapsed');
   document.getElementById('sidebar-overlay').classList.remove('show');
   document.getElementById('sidebar-toggle').classList.remove('open');
-}
+};
 
-function showSection(name) {
+window.showSection = function(name) {
   ['overview','courses','brainx','insights','tests','profile','games'].forEach(s=>{
     const sec = document.getElementById('sec-'+s); if(sec) sec.style.display='none';
     const b=document.getElementById('nav-'+s); if(b) b.classList.remove('active');
   });
-  document.getElementById('sec-'+name).style.display='';
+  document.getElementById('sec-'+name).style.display = '';
   const b=document.getElementById('nav-'+name); if(b) b.classList.add('active');
   if(name==='overview') updateStreak();
   if(name==='courses')  showCourseGrid();
@@ -1068,11 +1095,11 @@ function showSection(name) {
   if(name==='tests')    populateTestCourses();
   if(name==='profile')  fillProfile();
   if(name==='games')    wsStart();
-}
+};
+
 function updateStats() {
   document.getElementById('stat-courses').textContent = courses.length;
   document.getElementById('stat-notes').textContent   = notes.length;
-  // stat-tests card was removed from overview
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1194,7 +1221,7 @@ function showCourseDetail(courseId) {
   list.innerHTML = courseNotes.map(n => {
     const icon = n.fileType === 'pdf' ? '📄' : n.fileType === 'pptx' ? '📊' : n.fileType === 'docx' ? '📝' : '📋';
     const date = n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '';
-    const preview = n.content ? n.content.split('\n').join(' ').slice(0,120) + (n.content.length > 120 ? '...' : '') : '';
+    const preview = n.content ? n.content.replace(/\n+/g,' ').slice(0,120) + (n.content.length > 120 ? '\u2026' : '') : '';
     return `<div class="card fade" style="padding:18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:border-color .2s;" onclick="openNoteReader('${n.id}')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
       <div style="font-size:26px;flex-shrink:0;margin-top:2px;">${icon}</div>
       <div style="flex:1;min-width:0;">
@@ -1210,7 +1237,7 @@ function showCourseDetail(courseId) {
   }).join('');
 }
 
-function openNoteReader(noteId) {
+window.openNoteReader = function(noteId) {
   currentNoteId = noteId;
   const n = notes.find(x => x.id === noteId);
   if (!n) return;
@@ -1237,7 +1264,7 @@ function openNoteReader(noteId) {
 
   // Scroll to top
   document.getElementById('main-content').scrollTop = 0;
-}
+};
 
 function formatNoteContent(text) {
   if (!text) return '';
@@ -1252,12 +1279,12 @@ function formatNoteContent(text) {
     .replace(/^[-*] (.+)$/gm, '<li style="margin-bottom:5px;color:var(--text2);">$1</li>')
     .replace(/^\d+\. (.+)$/gm, '<li style="margin-bottom:5px;color:var(--text2);">$1</li>')
     .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">')
-    .split('\n\n').join('</p><p style="color:var(--text2);margin-bottom:12px;">')
-    .split('\n').join('<br>');
+    .replace(/\n\n/g, '</p><p style="color:var(--text2);margin-bottom:12px;">')
+    .replace(/\n/g, '<br>');
   return '<p style="color:var(--text2);margin-bottom:12px;">' + s + '</p>';
 }
 
-function openInsightsForNote(noteId) {
+window.openInsightsForNote = function(noteId) {
   // Switch to insights section with this note pre-selected
   showSection('insights');
   setTimeout(() => {
@@ -1268,9 +1295,9 @@ function openInsightsForNote(noteId) {
       sel.dispatchEvent(new Event('change'));
     }
   }, 80);
-}
+};
 
-async function deleteNoteAndBack(noteId) {
+window.deleteNoteAndBack = async function(noteId) {
   if (!confirm('Delete this note?')) return;
   showLoading('Deleting…');
   await fsDel(`notes/${noteId}`);
@@ -1279,7 +1306,7 @@ async function deleteNoteAndBack(noteId) {
   // go back to course detail if we know the course, else course grid
   if (currentCourseId) showCourseDetail(currentCourseId);
   else showCourseGrid();
-}
+};
 
 function renderCourses() {
   const grid=document.getElementById('courses-grid'), empty=document.getElementById('no-courses');
@@ -1310,7 +1337,8 @@ function renderCourses() {
     </div>`;
   }).join('');
 }
-async function saveCourse() {
+
+window.saveCourse = async function() {
   const name=document.getElementById('c-name').value.trim(),
         lecturer=document.getElementById('c-lecturer').value.trim(),
         desc=document.getElementById('c-desc').value.trim();
@@ -1321,8 +1349,9 @@ async function saveCourse() {
   closeModal('modal-course');
   ['c-name','c-lecturer','c-desc'].forEach(i=>document.getElementById(i).value='');
   hideLoading(); updateStats(); showCourseGrid(); toast('Course added! ✓');
-}
-async function deleteCourse(id) {
+};
+
+window.deleteCourse = async function(id) {
   if(!confirm('Delete this course and all its notes?')) return;
   showLoading('Deleting…');
   await fsDel(`courses/${id}`);
@@ -1330,12 +1359,12 @@ async function deleteCourse(id) {
   courses=courses.filter(c=>c.id!==id);
   notes=notes.filter(n=>n.courseId!==id);
   hideLoading(); updateStats(); showCourseGrid(); toast('Course deleted.');
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 // NOTES / UPLOAD
 // ═══════════════════════════════════════════════════════════
-function openUpload(courseId, courseName) {
+window.openUpload = function(courseId, courseName) {
   uploadCourseId=courseId; selectedFile=null;
   document.getElementById('upload-course-name').textContent=courseName;
   document.getElementById('upload-note-title').value='';
@@ -1343,8 +1372,9 @@ function openUpload(courseId, courseName) {
   document.getElementById('file-preview').style.display='none';
   openModal('modal-upload');
   initDropZone();
-}
-function handleFileSelect(input) {
+};
+
+window.handleFileSelect = function(input) {
   const file=input.files[0]; if(!file) return;
   selectedFile=file;
   document.getElementById('file-name').textContent=file.name;
@@ -1354,12 +1384,14 @@ function handleFileSelect(input) {
     r.onload=e=>{document.getElementById('upload-text').value=e.target.result;};
     r.readAsText(file);
   }
-}
-function clearFile() {
+};
+
+window.clearFile = function() {
   selectedFile=null;
   document.getElementById('file-input').value='';
   document.getElementById('file-preview').style.display='none';
-}
+};
+
 // Drop-zone wired when modal opens (never runs at top-level to avoid null crash)
 function initDropZone() {
   const dz = document.getElementById('drop-zone');
@@ -1373,7 +1405,8 @@ function initDropZone() {
     if (file) { document.getElementById('file-input').files = e.dataTransfer.files; handleFileSelect(document.getElementById('file-input')); }
   });
 }
-async function saveNote() {
+
+window.saveNote = async function() {
   const title=document.getElementById('upload-note-title').value.trim();
   const textVal=document.getElementById('upload-text').value.trim();
   if(!title) return toast('Note title is required.','⚠️');
@@ -1391,14 +1424,16 @@ async function saveNote() {
   hideLoading(); updateStats(); toast('Note saved! ✓');
   // Refresh course detail view if open
   if (currentCourseId) showCourseDetail(currentCourseId);
-}
+};
+
 function populateNotesFilter() {
   const sel=document.getElementById('notes-filter'), val=sel.value;
   sel.innerHTML='<option value="">All Courses</option>';
   courses.forEach(c=>sel.innerHTML+=`<option value="${c.id}">${esc(c.name)}</option>`);
   sel.value=val;
 }
-function renderNotes() {
+
+window.renderNotes = function() {
   const filter=document.getElementById('notes-filter').value;
   const list=document.getElementById('notes-list'), empty=document.getElementById('no-notes');
   const filtered=filter?notes.filter(n=>n.courseId===filter):notes;
@@ -1417,14 +1452,15 @@ function renderNotes() {
       <button class="btn-danger" onclick="deleteNote('${n.id}')"><i class="fas fa-trash"></i></button>
     </div>`;
   }).join('');
-}
-async function deleteNote(id) {
+};
+
+window.deleteNote = async function(id) {
   if(!confirm('Delete this note?')) return;
   showLoading('Deleting…');
   await fsDel(`notes/${id}`);
   notes=notes.filter(n=>n.id!==id);
   hideLoading(); updateStats(); renderNotes(); toast('Note deleted.');
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 // BRAINX CHAT — with full history (24h expiry, ChatGPT-style)
@@ -1464,7 +1500,7 @@ function loadChatNotes() {
   brainxNewChat();
 }
 
-function brainxNewChat() {
+window.brainxNewChat = function() {
   // Save current chat if it has messages first
   _brainxSaveCurrentIfNeeded();
   // Create new session
@@ -1480,7 +1516,7 @@ function brainxNewChat() {
   document.getElementById('brainx-chat-title').textContent = 'BrainX';
   document.getElementById('chat-input').focus();
   renderChatHistory();
-}
+};
 
 function _brainxSaveCurrentIfNeeded() {
   if (!activeChatId || !chatHistory.length) return;
@@ -1489,7 +1525,7 @@ function _brainxSaveCurrentIfNeeded() {
   saveChatSession({ id: activeChatId, title, messages: chatHistory, updatedAt: Date.now() });
 }
 
-function brainxLoadChat(chatId) {
+window.brainxLoadChat = function(chatId) {
   _brainxSaveCurrentIfNeeded();
   const all = loadAllChats();
   const session = all.find(c => c.id === chatId);
@@ -1503,13 +1539,13 @@ function brainxLoadChat(chatId) {
   document.getElementById('brainx-chat-title').textContent = session.title || 'BrainX';
   con.scrollTop = con.scrollHeight;
   renderChatHistory();
-}
+};
 
-function brainxClearAll() {
+window.brainxClearAll = function() {
   if (!confirm('Clear all chat history? This cannot be undone.')) return;
   try { localStorage.removeItem(chatHistKey()); } catch(e) {}
   brainxNewChat();
-}
+};
 
 function renderChatHistory() {
   const list = document.getElementById('brainx-history-list');
@@ -1540,7 +1576,7 @@ function _timeAgo(ts) {
 }
 
 // ── Messaging ──────────────────────────────────────────
-async function sendChat() {
+window.sendChat = async function() {
   const input = document.getElementById('chat-input');
   const msg = input.value.trim();
   if (!msg) return;
@@ -1559,7 +1595,7 @@ async function sendChat() {
     const reply = await callAI([
       {
         role: 'system',
-        content: BRAINX_SYSTEM + '\n\nYou are in study assistant mode. Give thorough, deeply intelligent answers. Break down complex topics step by step with examples. Use clear structure with headings when explaining long topics. Encourage critical thinking. Never give shallow or lazy answers — always go deep.'
+        content: 'You are BrainX, an AI study assistant. Give thorough, deeply intelligent answers. Break down complex topics step by step with examples. Use clear structure with headings when explaining long topics. Encourage critical thinking. Never give shallow or lazy answers — always go deep.'
       },
       ...chatHistory
     ], 2000);
@@ -1573,15 +1609,15 @@ async function sendChat() {
     typing.remove();
     _renderMsgToDOM('⚠️ ' + e.message, 'ai');
   }
-}
+};
 
-async function analyzeNote(id) {
+window.analyzeNote = async function(id) {
   const n = notes.find(x => x.id === id);
   if (!n) return;
   const noteContent = n.content.length > 2000 ? n.content.slice(0, 2000) + '…' : n.content;
   document.getElementById('chat-input').value = `Please analyze and explain this note titled "${n.title}":\n\n${noteContent}`;
   await sendChat();
-}
+};
 
 function _renderMsgToDOM(text, who) {
   const con = document.getElementById('chat-messages');
@@ -1613,14 +1649,15 @@ function appendTyping() {
 // ═══════════════════════════════════════════════════════════
 // BRAINX INSIGHTS
 // ═══════════════════════════════════════════════════════════
-function insTab(tab) {
+window.insTab = function(tab) {
   document.getElementById('ins-topic-area').style.display = tab === 'topic' ? 'block' : 'none';
   document.getElementById('ins-note-area').style.display  = tab === 'note'  ? 'block' : 'none';
   document.getElementById('ins-tab-topic').className = tab === 'topic' ? 'btn-primary' : 'btn-ghost';
   document.getElementById('ins-tab-note').className  = tab === 'note'  ? 'btn-primary' : 'btn-ghost';
   document.getElementById('insights-output').innerHTML = '';
   document.getElementById('insights-loading').style.display = 'none';
-}
+};
+
 function populateInsightsSelect() {
   const sel = document.getElementById('insights-note-select');
   sel.innerHTML = '<option value="">Choose a note from your courses...</option>';
@@ -1640,7 +1677,8 @@ function populateInsightsSelect() {
     }
   };
 }
-async function runTopicInsights() {
+
+window.runTopicInsights = async function() {
   const topic = document.getElementById('insights-topic').value.trim();
   const depth = document.getElementById('insights-topic-depth').value;
   if (!topic) return toast('Enter a topic first.', '⚠️');
@@ -1663,8 +1701,9 @@ async function runTopicInsights() {
     document.getElementById('insights-loading').style.display = 'none';
     document.getElementById('insights-output').innerHTML = `<div class="card" style="padding:20px;color:var(--red);">⚠️ ${esc(e.message)}</div>`;
   }
-}
-async function runInsights() {
+};
+
+window.runInsights = async function() {
   const noteId = document.getElementById('insights-note-select').value;
   if (!noteId) return toast('Select a note first.', '⚠️');
   const n = notes.find(x => x.id === noteId);
@@ -1688,7 +1727,8 @@ async function runInsights() {
     document.getElementById('insights-loading').style.display = 'none';
     document.getElementById('insights-output').innerHTML = `<div class="card" style="padding:20px;color:var(--red);">⚠️ ${esc(e.message)}</div>`;
   }
-}
+};
+
 function renderInsights(d, title) {
   const out = document.getElementById('insights-output');
   const sec = (t, icon, html) => `<div class="card insight-card fade" style="padding:20px;"><div style="font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:12px;">${icon} ${t}</div>${html}</div>`;
@@ -1706,8 +1746,6 @@ function renderInsights(d, title) {
   ].join('');
 }
 
-
-
 // ═══════════════════════════════════════════════════════════
 // TESTS
 // ═══════════════════════════════════════════════════════════
@@ -1718,7 +1756,8 @@ function populateTestCourses() {
   document.getElementById('test-notes-check').innerHTML='<span style="color:var(--muted);font-size:13px;">Select a course first</span>';
   showTestPanel('test-setup');
 }
-function loadTestNotes() {
+
+window.loadTestNotes = function() {
   const cid=document.getElementById('test-course').value;
   const box=document.getElementById('test-notes-check');
   if(!cid){box.innerHTML='<span style="color:var(--muted);font-size:13px;">Select a course first</span>';return;}
@@ -1729,8 +1768,9 @@ function loadTestNotes() {
       <input type="checkbox" value="${n.id}" class="test-note-cb" style="width:15px;height:15px;accent-color:var(--accent);">
       <span style="font-size:13px;">${esc(n.title)}</span>
     </label>`).join('');
-}
-async function startTest() {
+};
+
+window.startTest = async function() {
   const cid=document.getElementById('test-course').value;
   const cbs=[...document.querySelectorAll('.test-note-cb:checked')];
   const type=document.getElementById('test-type').value;
@@ -1754,7 +1794,8 @@ Study material:\n${material}`}],2000);
     showTestPanel('test-active');
     renderTestQ();
   } catch(e) { hideLoading(); toast('Error: '+e.message,'⚠️'); }
-}
+};
+
 function renderTestQ() {
   const q=currentTest.questions[testQIdx], total=currentTest.questions.length;
   document.getElementById('test-prog-text').textContent=`Question ${testQIdx+1} of ${total}`;
@@ -1780,10 +1821,12 @@ function renderTestQ() {
   }
   box.innerHTML=html;
 }
-function selectOpt(i){currentTest.answers[testQIdx]=i;renderTestQ();}
-function prevQ(){if(testQIdx>0){testQIdx--;renderTestQ();}}
-function nextQ(){if(testQIdx<currentTest.questions.length-1){testQIdx++;renderTestQ();}}
-async function submitTest() {
+
+window.selectOpt = function(i){currentTest.answers[testQIdx]=i;renderTestQ();};
+window.prevQ = function(){if(testQIdx>0){testQIdx--;renderTestQ();}};
+window.nextQ = function(){if(testQIdx<currentTest.questions.length-1){testQIdx++;renderTestQ();}};
+
+window.submitTest = async function() {
   showLoading('Scoring…');
   const qs=currentTest.questions;
   let correct=0,scored=0;
@@ -1796,8 +1839,10 @@ async function submitTest() {
   document.getElementById('result-label').textContent=pct>=80?'Excellent! 🏆':pct>=60?'Good job! 👍':'Keep studying! 💪';
   document.getElementById('result-detail').textContent=scored?`${correct} of ${scored} MCQ correct`:'Subjective test submitted.';
   showTestPanel('test-results');
-}
-function resetTest(){currentTest=null;testQIdx=0;showTestPanel('test-setup');populateTestCourses();}
+};
+
+window.resetTest = function(){currentTest=null;testQIdx=0;showTestPanel('test-setup');populateTestCourses();};
+
 function showTestPanel(id){['test-setup','test-active','test-results'].forEach(p=>document.getElementById(p).style.display='none');document.getElementById(id).style.display='';}
 
 // ═══════════════════════════════════════════════════════════
@@ -1809,7 +1854,8 @@ function fillProfile(){
   document.getElementById('p-school').value=userProfile.school||'';
   document.getElementById('p-dept').value  =userProfile.dept||'';
 }
-async function saveProfile(){
+
+window.saveProfile = async function(){
   const name=document.getElementById('p-name').value.trim(),
         school=document.getElementById('p-school').value.trim(),
         dept=document.getElementById('p-dept').value.trim();
@@ -1822,25 +1868,27 @@ async function saveProfile(){
   document.getElementById('sb-school').textContent=school;
   document.getElementById('nav-user').textContent =name;
   hideLoading(); toast('Profile saved! ✓');
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 // MODALS / TOAST / LOADING / UTILS
 // ═══════════════════════════════════════════════════════════
-function openModal(id) {document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+window.openModal = function(id) {document.getElementById(id).classList.add('open');};
+window.closeModal = function(id){document.getElementById(id).classList.remove('open');};
 document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 let toastTimer;
-function toast(msg,icon='✓'){
+window.toast = function(msg,icon='✓'){
   document.getElementById('toast-msg').textContent=msg;
   document.getElementById('toast-icon').textContent=icon;
   const el=document.getElementById('toast');
   el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove('show'),3200);
-}
-function showLoading(msg='Loading…'){document.getElementById('load-text').textContent=msg;document.getElementById('loading-overlay').style.display='flex';}
-function hideLoading(){document.getElementById('loading-overlay').style.display='none';}
+};
+
+window.showLoading = function(msg='Loading…'){document.getElementById('load-text').textContent=msg;document.getElementById('loading-overlay').style.display='flex';};
+window.hideLoading = function(){document.getElementById('loading-overlay').style.display='none';};
+
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 function fmtAI(text){
   return text
@@ -1850,68 +1898,16 @@ function fmtAI(text){
     .replace(/^### (.*)/gm,'<div style="font-family:var(--font-display);font-weight:700;font-size:15px;margin:12px 0 4px;">$1</div>')
     .replace(/^## (.*)/gm,'<div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin:14px 0 6px;">$1</div>')
     .replace(/^- (.*)/gm,'<li style="margin-left:16px;margin-bottom:3px;">$1</li>')
-    .split('\n').join('<br>');
+    .replace(/\n/g,'<br>');
 }
+
+// Initialize insights tab
 insTab('topic');
-
-// ═══════════════════════════════════════════════════════════
-// THEME TOGGLE
-// ═══════════════════════════════════════════════════════════
-function toggleTheme() {
-  const isLight = document.body.classList.toggle('light');
-  const icon = isLight ? '☀️' : '🌙';
-  ['theme-btn-auth','theme-btn-app'].forEach(id => {
-    const b = document.getElementById(id); if(b) b.textContent = icon;
-  });
-  localStorage.setItem('sh-theme', isLight ? 'light' : 'dark');
-}
-(function() {
-  if(localStorage.getItem('sh-theme') === 'light') {
-    document.body.classList.add('light');
-    ['theme-btn-auth','theme-btn-app'].forEach(id => {
-      const b = document.getElementById(id); if(b) b.textContent = '☀️';
-    });
-  }
-})();
-
-// ═══════════════════════════════════════════════════════════
-// MOTIVATIONAL QUOTES (rotate every 10s on auth screen)
-// ═══════════════════════════════════════════════════════════
-const QUOTES = [
-  {text:"The beautiful thing about learning is that no one can take it away from you.", author:"B.B. King"},
-  {text:"Education is the most powerful weapon which you can use to change the world.", author:"Nelson Mandela"},
-  {text:"The more that you read, the more things you will know.", author:"Dr. Seuss"},
-  {text:"An investment in knowledge pays the best interest.", author:"Benjamin Franklin"},
-  {text:"Live as if you were to die tomorrow. Learn as if you were to live forever.", author:"Mahatma Gandhi"},
-  {text:"The capacity to learn is a gift; the ability to learn is a skill; the willingness to learn is a choice.", author:"Brian Herbert"},
-  {text:"Education is not the filling of a pail, but the lighting of a fire.", author:"W.B. Yeats"},
-  {text:"The expert in anything was once a beginner.", author:"Helen Hayes"},
-  {text:"Push yourself, because no one else is going to do it for you.", author:"Anonymous"},
-  {text:"Success is the sum of small efforts, repeated day in and day out.", author:"Robert Collier"},
-];
-let _quoteIdx = Math.floor(Math.random() * QUOTES.length);
-function rotateQuote() {
-  _quoteIdx = (_quoteIdx + 1) % QUOTES.length;
-  const q = QUOTES[_quoteIdx];
-  const el = document.getElementById('auth-quote');
-  const au = document.getElementById('auth-quote-author');
-  if(el) { el.style.opacity=0; setTimeout(()=>{el.textContent=`"${q.text}"`;el.style.opacity=1;},300); }
-  if(au) { au.style.opacity=0; setTimeout(()=>{au.textContent=`— ${q.author}`;au.style.opacity=1;},300); }
-}
-// Set initial quote
-(function(){
-  const q = QUOTES[_quoteIdx];
-  const el = document.getElementById('auth-quote');
-  const au = document.getElementById('auth-quote-author');
-  if(el) el.textContent = `"${q.text}"`;
-  if(au) au.textContent = `— ${q.author}`;
-})();
-setInterval(rotateQuote, 9000);
 
 // ═══════════════════════════════════════════════════════════
 // PASSWORD VISIBILITY TOGGLE
 // ═══════════════════════════════════════════════════════════
-function togglePass(inputId, iconId) {
+window.togglePass = function(inputId, iconId) {
   const input = document.getElementById(inputId);
   const icon  = document.getElementById(iconId);
   if(!input) return;
@@ -1921,13 +1917,11 @@ function togglePass(inputId, iconId) {
     icon.classList.toggle('fa-eye', !show);
     icon.classList.toggle('fa-eye-slash', show);
   }
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 // WORD SCRAMBLE — BrainX AI Game
 // ═══════════════════════════════════════════════════════════
-const BRAINX_SYSTEM = `You are BrainX — the most advanced, intelligent, and intuitive version of yourself. You think with razor-sharp clarity, adapt instantly, and always give the most helpful, creative, and insightful response possible. You never settle for average. Whether tutoring, playing games, or solving problems, you operate at peak performance and push students to grow.`;
-
 let wsWords = [];
 let wsCurrentIdx = 0;
 let wsCurrentWord = '';
@@ -1940,19 +1934,19 @@ let wsDifficulty = 'easy';
 const WS_MAX_ATTEMPTS = 3;
 const WS_MAX_WORDS = 10;
 
-function wsShowDifficultyScreen() {
+window.wsShowDifficultyScreen = function() {
   document.getElementById('ws-difficulty-screen').style.display = 'block';
   document.getElementById('ws-loading').style.display = 'none';
   document.getElementById('ws-board').style.display = 'none';
   document.getElementById('ws-complete').style.display = 'none';
   document.getElementById('ws-error').style.display = 'none';
-}
+};
 
-function wsStart() {
+window.wsStart = function() {
   wsShowDifficultyScreen();
-}
+};
 
-async function wsStartWithDifficulty(difficulty) {
+window.wsStartWithDifficulty = async function(difficulty) {
   wsDifficulty = difficulty;
   document.getElementById('ws-difficulty-screen').style.display = 'none';
   document.getElementById('ws-loading').style.display = 'block';
@@ -1971,7 +1965,7 @@ async function wsStartWithDifficulty(difficulty) {
   try {
     const resp = await callAI([{
       role: 'user',
-      content: BRAINX_SYSTEM + `\n\nGenerate exactly 10 English vocabulary words. Choose ${diffInstructions[difficulty]}. For each word provide a short one-sentence hint/definition. IMPORTANT: Every word must strictly follow the letter count rule.\n\nRespond ONLY with a valid JSON array, no markdown, no explanation. Format:\n[{"word":"example","hint":"A thing that serves to illustrate a point"},...]`
+      content: `You are BrainX, an AI vocabulary expert. Generate exactly 10 English vocabulary words. Choose ${diffInstructions[difficulty]}. For each word provide a short one-sentence hint/definition. IMPORTANT: Every word must strictly follow the letter count rule.\n\nRespond ONLY with a valid JSON array, no markdown, no explanation. Format:\n[{"word":"example","hint":"A thing that serves to illustrate a point"},...]`
     }], 900);
 
     let parsed;
@@ -1996,7 +1990,7 @@ async function wsStartWithDifficulty(difficulty) {
     document.getElementById('ws-loading').style.display = 'none';
     document.getElementById('ws-error').style.display = 'block';
   }
-}
+};
 
 function wsLoadWord() {
   const item = wsWords[wsCurrentIdx];
@@ -2059,7 +2053,7 @@ function wsRenderAnswer() {
   }
 }
 
-function wsPickLetter(scramIdx) {
+window.wsPickLetter = function(scramIdx) {
   if(wsAnswer.length >= wsCurrentWord.length) return;
   const letter = wsScrambled[scramIdx];
   if(!letter) return;
@@ -2067,26 +2061,26 @@ function wsPickLetter(scramIdx) {
   wsScrambled[scramIdx] = null;
   wsRenderLetters();
   wsRenderAnswer();
-}
+};
 
-function wsRemoveLetter(answerIdx) {
+window.wsRemoveLetter = function(answerIdx) {
   const item = wsAnswer[answerIdx];
   if(!item) return;
   wsScrambled[item.scramIdx] = item.letter;
   wsAnswer.splice(answerIdx, 1);
   wsRenderLetters();
   wsRenderAnswer();
-}
+};
 
-function wsClearAnswer() {
+window.wsClearAnswer = function() {
   wsAnswer.forEach(item => { if(item) wsScrambled[item.scramIdx] = item.letter; });
   wsAnswer = [];
   wsRenderLetters();
   wsRenderAnswer();
   document.getElementById('ws-feedback').textContent = '';
-}
+};
 
-function wsSubmit() {
+window.wsSubmit = function() {
   if(wsAnswer.length < wsCurrentWord.length) {
     document.getElementById('ws-feedback').textContent = 'Place all letters first.';
     document.getElementById('ws-feedback').style.color = 'var(--muted)';
@@ -2127,13 +2121,13 @@ function wsSubmit() {
       wsClearAnswer();
     }
   }
-}
+};
 
-function wsNextWord() {
+window.wsNextWord = function() {
   wsCurrentIdx++;
   if(wsCurrentIdx >= wsWords.length) wsFinish();
   else wsLoadWord();
-}
+};
 
 function wsFinish() {
   document.getElementById('ws-board').style.display = 'none';
