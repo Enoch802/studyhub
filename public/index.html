@@ -1342,6 +1342,7 @@ function openUpload(courseId, courseName) {
   document.getElementById('upload-text').value='';
   document.getElementById('file-preview').style.display='none';
   openModal('modal-upload');
+  initDropZone();
 }
 function handleFileSelect(input) {
   const file=input.files[0]; if(!file) return;
@@ -1359,14 +1360,19 @@ function clearFile() {
   document.getElementById('file-input').value='';
   document.getElementById('file-preview').style.display='none';
 }
-const dz=document.getElementById('drop-zone');
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
-dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
-dz.addEventListener('drop',e=>{
-  e.preventDefault();dz.classList.remove('drag-over');
-  const file=e.dataTransfer.files[0];
-  if(file){document.getElementById('file-input').files=e.dataTransfer.files;handleFileSelect(document.getElementById('file-input'));}
-});
+// Drop-zone wired when modal opens (never runs at top-level to avoid null crash)
+function initDropZone() {
+  const dz = document.getElementById('drop-zone');
+  if (!dz || dz._dzReady) return;
+  dz._dzReady = true;
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.classList.add('drag-over'); });
+  dz.addEventListener('dragleave', () => dz.classList.remove('drag-over'));
+  dz.addEventListener('drop', e => {
+    e.preventDefault(); dz.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file) { document.getElementById('file-input').files = e.dataTransfer.files; handleFileSelect(document.getElementById('file-input')); }
+  });
+}
 async function saveNote() {
   const title=document.getElementById('upload-note-title').value.trim();
   const textVal=document.getElementById('upload-text').value.trim();
