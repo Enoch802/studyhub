@@ -1,17 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StudyHub — AI-Powered Learning</title>
+<!-- Favicon (fixes 404) -->
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
 <script>tailwind.config = { corePlugins: { preflight: false } }</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-<!-- Firebase with debug logs -->
+<!-- Firebase with Storage -->
 <script type="module">
   console.log('🔥 Firebase module: started');
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -19,8 +20,9 @@
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
   import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, query, where, updateDoc }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+  import { getStorage, ref, uploadBytes, getDownloadURL }
+    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
-  // ── Firebase config ──────────────────────────────────────────
   const firebaseConfig = {
     apiKey: "AIzaSyBioZFtI6G-wzOHb0ljj3RVP_DDIfqkKwk",
     authDomain: "studyhub-87ac9.firebaseapp.com",
@@ -29,7 +31,6 @@
     messagingSenderId: "105165121582",
     appId: "1:105165121582:web:eb4a4780b8470cce0857bf"
   };
-  // ─────────────────────────────────────────────────────────────
 
   try {
     console.log('🔥 Firebase: initializing app...');
@@ -38,7 +39,8 @@
 
     window._auth = getAuth(app);
     window._db   = getFirestore(app);
-    console.log('✅ Firebase auth & db ready');
+    window._storage = getStorage(app);
+    console.log('✅ Firebase auth, db & storage ready');
 
     window._fbFns = {
       createUserWithEmailAndPassword, signInWithEmailAndPassword,
@@ -55,7 +57,7 @@
 </script>
 
 <style>
-  /* ── Design Tokens ─────────────────────────────────────── */
+  /* (keep all your existing styles) */
   :root {
     --bg:#07090e; --surface:#0f1218; --surface2:#161c26;
     --border:rgba(255,255,255,0.06); --border2:rgba(255,255,255,0.11);
@@ -76,27 +78,22 @@
     --shadow:0 4px 20px rgba(0,0,0,0.08);
   }
 
-  /* ── Reset ─────────────────────────────────────────────── */
   *{box-sizing:border-box;margin:0;padding:0;}
   html,body{height:100%;background:var(--bg);color:var(--text);font-family:var(--font-body);font-size:15px;line-height:1.6;letter-spacing:-0.01em;-webkit-font-smoothing:antialiased;}
 
-  /* ── Typography ────────────────────────────────────────── */
   h1,h2,h3,h4{font-family:var(--font-display);font-weight:600;letter-spacing:-0.02em;line-height:1.25;}
   h2{font-size:1.6rem;}
   h3{font-size:1.2rem;}
   p{color:var(--text2);}
   .label{font-size:11px;font-weight:600;letter-spacing:0.08em;text-transform:uppercase;color:var(--muted);}
 
-  /* ── Gradient Text ──────────────────────────────────────── */
   .grad-text{background:linear-gradient(135deg,var(--accent) 0%,var(--accent2) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;}
 
-  /* ── Cards ─────────────────────────────────────────────── */
   .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);transition:border-color .2s;}
   .card:hover{border-color:var(--border2);}
   .card2{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius-sm);}
   .glass{background:rgba(255,255,255,0.03);backdrop-filter:blur(16px);border:1px solid var(--border);}
 
-  /* ── Inputs ─────────────────────────────────────────────── */
   input,select,textarea{
     background:var(--surface2);border:1px solid var(--border);color:var(--text);
     border-radius:var(--radius-sm);padding:11px 15px;
@@ -109,7 +106,6 @@
   body.light input,body.light select,body.light textarea{background:var(--surface2);color:var(--text);}
   body.light select option{background:var(--surface);}
 
-  /* ── Buttons ────────────────────────────────────────────── */
   .btn-primary{
     background:linear-gradient(135deg,var(--accent),var(--accent2));
     color:#fff;border:none;border-radius:var(--radius-sm);
@@ -132,7 +128,6 @@
   .btn-icon{background:transparent;border:1px solid var(--border);color:var(--text2);border-radius:var(--radius-sm);padding:8px 12px;cursor:pointer;font-size:13px;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
   .btn-icon:hover{background:var(--surface2);border-color:var(--border2);color:var(--text);}
 
-  /* ── Navigation ─────────────────────────────────────────── */
   .nav{
     position:fixed;top:0;left:0;right:0;z-index:100;height:58px;
     display:flex;align-items:center;padding:0 28px;
@@ -142,7 +137,6 @@
   body.light .nav{background:rgba(245,247,252,0.9);}
   .logo{font-family:var(--font-display);font-size:20px;font-weight:700;cursor:pointer;letter-spacing:-0.03em;}
 
-  /* ── Sidebar ────────────────────────────────────────────── */
   .sidebar{
     width:216px;background:var(--surface);border-right:1px solid var(--border);
     display:flex;flex-direction:column;padding:18px 10px;gap:2px;
@@ -155,7 +149,6 @@
   .sidebar-overlay.show{display:block;}
   .main-content{flex:1;overflow-y:auto;padding:32px;background:var(--bg);}
 
-  /* ── Hamburger ──────────────────────────────────────────── */
   .three-dots-btn{display:flex;flex-direction:column;gap:4.5px;padding:8px;cursor:pointer;background:transparent;border:none;border-radius:var(--radius-sm);transition:background .2s;}
   .three-dots-btn:hover{background:var(--surface2);}
   .three-dots-btn span{display:block;width:18px;height:1.5px;background:var(--text);border-radius:2px;transition:all .28s cubic-bezier(.4,0,.2,1);}
@@ -163,7 +156,6 @@
   .three-dots-btn.open span:nth-child(2){opacity:0;transform:scaleX(0);}
   .three-dots-btn.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
 
-  /* ── Nav Buttons ────────────────────────────────────────── */
   .nav-btn{
     display:flex;align-items:center;gap:9px;padding:9px 13px;
     border-radius:var(--radius-sm);border:none;background:transparent;
@@ -175,7 +167,6 @@
   .nav-btn i{width:15px;text-align:center;font-size:13px;}
   .sidebar-section-label{font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--muted);padding:14px 13px 6px;}
 
-  /* ── Auth Screen ────────────────────────────────────────── */
   .auth-bg{
     min-height:100vh;display:flex;align-items:center;justify-content:center;
     background:
@@ -185,55 +176,43 @@
   }
   body.light .auth-bg{background:radial-gradient(ellipse 70% 60% at 10% 50%,rgba(61,127,255,0.07) 0%,transparent 70%),radial-gradient(ellipse 50% 40% at 90% 20%,rgba(139,92,246,0.05) 0%,transparent 60%),var(--bg);}
 
-  /* ── Theme Button ───────────────────────────────────────── */
   .theme-btn{background:transparent;border:1px solid var(--border2);color:var(--text);border-radius:var(--radius-sm);padding:7px 10px;cursor:pointer;font-size:15px;transition:background .2s;line-height:1;display:inline-flex;align-items:center;}
   .theme-btn:hover{background:var(--surface2);}
 
-  /* ── Scrollbar ──────────────────────────────────────────── */
   ::-webkit-scrollbar{width:4px;}
   ::-webkit-scrollbar-track{background:transparent;}
   ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
 
-  /* ── Chat Bubbles ───────────────────────────────────────── */
   .chat-user{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;padding:10px 15px;border-radius:16px 16px 4px 16px;max-width:75%;font-size:13.5px;line-height:1.55;font-weight:400;}
   .chat-ai{background:var(--surface2);border:1px solid var(--border);padding:11px 15px;border-radius:4px 16px 16px 16px;max-width:86%;font-size:13.5px;line-height:1.65;}
 
-  /* ── BrainX Logo (SVG inline icon) ─────────────────────── */
   .brainx-avatar{width:36px;height:36px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 12px rgba(61,127,255,0.3);}
 
-  /* ── Drop Zone ──────────────────────────────────────────── */
   .drop-zone{border:1.5px dashed var(--border2);border-radius:var(--radius);padding:40px;text-align:center;transition:all .2s;cursor:pointer;}
   .drop-zone:hover,.drop-zone.drag-over{border-color:var(--accent);background:rgba(61,127,255,0.04);}
 
-  /* ── Toast ──────────────────────────────────────────────── */
   #toast{position:fixed;bottom:24px;right:24px;z-index:9999;transition:all .3s cubic-bezier(.4,0,.2,1);transform:translateY(80px);opacity:0;}
   #toast.show{transform:translateY(0);opacity:1;}
 
-  /* ── Modals ─────────────────────────────────────────────── */
   .modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);z-index:200;display:none;align-items:center;justify-content:center;padding:16px;}
   .modal-bg.open{display:flex;}
 
-  /* ── Progress ───────────────────────────────────────────── */
   .prog-bar{height:2px;background:var(--surface2);border-radius:2px;overflow:hidden;}
   .prog-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:2px;transition:width .3s;}
 
-  /* ── Typing Dots ────────────────────────────────────────── */
   .dot{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--muted);animation:bounce 1.2s infinite;}
   .dot:nth-child(2){animation-delay:.2s;}.dot:nth-child(3){animation-delay:.4s;}
   @keyframes bounce{0%,60%,100%{transform:translateY(0);}30%{transform:translateY(-4px);}}
 
-  /* ── Page Transitions ───────────────────────────────────── */
   .fade{animation:fadeUp .25s ease;}
   @keyframes fadeUp{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
 
-  /* ── Insight & Badge ────────────────────────────────────── */
   .insight-card{border-left:2px solid var(--accent);}
   .star-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;font-size:11.5px;font-weight:600;}
   .opt-label{display:flex;align-items:center;gap:12px;padding:12px 15px;border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;transition:all .2s;}
   .opt-label:hover{border-color:var(--accent);background:rgba(61,127,255,0.05);}
   .opt-label.selected{border-color:var(--accent);background:rgba(61,127,255,0.09);}
 
-  /* ── Word Scramble Game ─────────────────────────────────── */
   .ws-letter{
     display:inline-flex;align-items:center;justify-content:center;
     width:44px;height:52px;
@@ -259,7 +238,6 @@
   @keyframes pop{0%{transform:scale(1);}50%{transform:scale(1.15);}100%{transform:scale(1);}}
   .ws-letter.pop{animation:pop .25s ease;}
 
-  /* ── Misc ───────────────────────────────────────────────── */
   @keyframes spin{to{transform:rotate(360deg);}}
   #auth-quote,#auth-quote-author{transition:opacity .35s ease;}
   .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
@@ -945,7 +923,7 @@ window.deleteCourse = async function(id) {
 };
 
 // ═══════════════════════════════════════════════════════════
-// NOTES / UPLOAD
+// NOTES / UPLOAD (with Firebase Storage)
 // ═══════════════════════════════════════════════════════════
 window.openUpload = function(courseId, courseName) {
   uploadCourseId=courseId; selectedFile=null;
@@ -989,21 +967,55 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 window.saveNote = async function() {
-  const title=document.getElementById('upload-note-title').value.trim();
-  const textVal=document.getElementById('upload-text').value.trim();
-  if(!title) return toast('Note title is required.','⚠️');
-  if(!textVal&&!selectedFile) return toast('Provide note content or upload a file.','⚠️');
-  let content=textVal, fileName='', fileType='text';
-  if(selectedFile) {
-    fileName=selectedFile.name;
-    fileType=fileName.endsWith('.pdf')?'pdf':fileName.endsWith('.pptx')?'pptx':fileName.endsWith('.docx')?'docx':'text';
-    if(!content) content=`[File uploaded: ${fileName}] — Paste the text content above for AI features.`;
-  }
+  const title = document.getElementById('upload-note-title').value.trim();
+  const textVal = document.getElementById('upload-text').value.trim();
+  if (!title) return toast('Note title is required.', '⚠️');
+  if (!textVal && !selectedFile) return toast('Provide note content or upload a file.', '⚠️');
+
   showLoading('Saving note…');
-  const id=await fsAdd('notes',{uid:uid(),courseId:uploadCourseId,title,content,fileName,fileType,createdAt:Date.now()});
-  notes.push({id,uid:uid(),courseId:uploadCourseId,title,content,fileName,fileType});
+
+  let content = textVal;
+  let fileType = 'text';
+  let fileURL = '';
+  let fileName = '';
+
+  if (selectedFile) {
+    fileType = selectedFile.name.endsWith('.pdf') ? 'pdf' :
+               selectedFile.name.endsWith('.pptx') ? 'pptx' :
+               selectedFile.name.endsWith('.docx') ? 'docx' : 'text';
+    fileName = selectedFile.name;
+
+    // Upload to Firebase Storage
+    try {
+      const storageRef = ref(window._storage, `notes/${uid()}/${Date.now()}_${fileName}`);
+      await uploadBytes(storageRef, selectedFile);
+      fileURL = await getDownloadURL(storageRef);
+      content = textVal || `[File: ${fileName}]`; // keep pasted text if any
+    } catch (uploadError) {
+      console.error('Upload error:', uploadError);
+      hideLoading();
+      return toast('File upload failed. Check Storage permissions.', '❌');
+    }
+  }
+
+  const noteData = {
+    uid: uid(),
+    courseId: uploadCourseId,
+    title,
+    content,
+    fileType,
+    fileName: fileName || '',
+    fileURL,          // ← stored for opening later
+    createdAt: Date.now()
+  };
+
+  const id = await fsAdd('notes', noteData);
+  notes.push({ id, ...noteData });
   closeModal('modal-upload');
-  hideLoading(); updateStats(); toast('Note saved! ✓');
+  hideLoading();
+  updateStats();
+  toast('Note saved! ✓');
+  if (currentCourseId) showCourseDetail(currentCourseId);
 };
 
 function populateNotesFilter() {
@@ -1411,7 +1423,6 @@ const WS_MAX_ATTEMPTS = 3;
 const WS_MAX_WORDS = 10;
 
 window.wsStart = async function() {
-  // Show loading, hide all others
   document.getElementById('ws-loading').style.display = 'block';
   document.getElementById('ws-board').style.display = 'none';
   document.getElementById('ws-complete').style.display = 'none';
@@ -1430,7 +1441,6 @@ window.wsStart = async function() {
       const clean = resp.replace(/```json|```/g,'').trim();
       parsed = JSON.parse(clean);
     } catch(e) {
-      // Try to extract JSON from response
       const match = resp.match(/\[[\s\S]+\]/);
       if(match) parsed = JSON.parse(match[0]);
       else throw new Error('Invalid JSON from AI');
@@ -1451,7 +1461,6 @@ function wsLoadWord() {
   wsAttempts = 0;
   wsAnswer = [];
   wsScrambled = wsCurrentWord.split('').sort(() => Math.random() - 0.5);
-  // Ensure scrambled !== original
   while(wsScrambled.join('') === wsCurrentWord && wsCurrentWord.length > 1) {
     wsScrambled.sort(() => Math.random() - 0.5);
   }
@@ -1539,19 +1548,15 @@ window.wsSubmit = function() {
   wsAttempts++;
 
   if(guess === wsCurrentWord) {
-    // Correct!
     wsCorrect++;
     const pts = Math.max(10, 30 - (wsAttempts - 1) * 10);
     wsScore += pts;
     document.getElementById('ws-score').textContent = wsScore;
     document.getElementById('ws-feedback').textContent = wsAttempts === 1 ? `Perfect! +${pts} pts` : `Correct! +${pts} pts`;
     document.getElementById('ws-feedback').style.color = 'var(--green)';
-
-    // Flash correct
     document.querySelectorAll('.ws-slot').forEach(s => { s.style.borderColor='var(--green)'; s.style.color='var(--green)'; });
     setTimeout(() => { if(wsCurrentIdx + 1 >= wsWords.length) wsFinish(); else { wsCurrentIdx++; wsLoadWord(); } }, 1200);
   } else {
-    // Wrong
     const attLeft = WS_MAX_ATTEMPTS - wsAttempts;
     document.getElementById('ws-feedback').style.color = 'var(--red)';
     document.getElementById('ws-attempts-left').textContent = attLeft;
@@ -1582,6 +1587,50 @@ function wsFinish() {
   document.getElementById('ws-final-total').textContent = wsWords.length;
   document.getElementById('ws-final-score').textContent = wsScore + ' pts';
 }
+
+// ═══════════════════════════════════════════════════════════
+// NOTE READER with file open button
+// ═══════════════════════════════════════════════════════════
+window.openNoteReader = function(noteId) {
+  currentNoteId = noteId;
+  const n = notes.find(x => x.id === noteId);
+  if (!n) return;
+  const c = courses.find(x => x.id === n.courseId);
+
+  document.getElementById('view-courses-grid').style.display = 'none';
+  document.getElementById('view-course-detail').style.display = 'none';
+  document.getElementById('view-note-reader').style.display = '';
+
+  document.getElementById('nr-back-label').textContent = c ? c.name : 'Notes';
+  document.getElementById('nr-note-title').textContent = n.title;
+  document.getElementById('nr-note-meta').innerHTML = `${c ? '<i class="fas fa-graduation-cap"></i> ' + esc(c.name) + ' · ' : ''}${n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : ''}`;
+
+  const contentEl = document.getElementById('nr-note-content');
+  if (!n.content || n.content.startsWith('[File:')) {
+    contentEl.innerHTML = `<div style="text-align:center;padding:40px 0;color:var(--muted);">
+      <i class="fas fa-file" style="font-size:36px;margin-bottom:12px;display:block;"></i>
+      <p>This note was uploaded as a file. Paste the text content when uploading to view it here.</p>
+    </div>`;
+  } else {
+    contentEl.innerHTML = formatNoteContent(n.content);
+  }
+
+  // If there's a file URL, add a button to open it
+  if (n.fileURL) {
+    const button = document.createElement('div');
+    button.style.marginTop = '24px';
+    button.style.textAlign = 'center';
+    button.innerHTML = `<a href="${n.fileURL}" target="_blank" class="btn-primary" style="display:inline-block; padding:10px 24px; text-decoration:none;">
+      <i class="fas fa-external-link-alt"></i> Open Original File
+    </a>`;
+    contentEl.appendChild(button);
+  }
+
+  document.getElementById('main-content').scrollTop = 0;
+};
+
+// Also need to add the note reader view HTML (if missing)
+// Make sure your HTML includes the view-note-reader section (already present in this file)
 </script>
 </body>
 </html>
