@@ -739,7 +739,7 @@ window.callAI = async function(messages, max_tokens = 2000) {
 let currentUser = null, userProfile = {};
 let courses = [], notes = [], testHistory = [];
 let uploadCourseId = null, selectedFile = null;
-let currentCourseId = null;   // ← added missing global
+let currentCourseId = null;      // ← now defined globally
 let currentNoteId = null;
 let currentTest = null, testQIdx = 0;
 let chatHistory = [];
@@ -904,7 +904,7 @@ function updateStats() {
 }
 
 // ═══════════════════════════════════════════════════════════
-// COURSES
+// COURSES (attached to window for global access)
 // ═══════════════════════════════════════════════════════════
 function renderCourses() {
   const grid=document.getElementById('courses-grid'), empty=document.getElementById('no-courses');
@@ -1008,7 +1008,7 @@ window.saveNote = async function() {
 
   if (!textVal && !hasFile) return toast('Provide note content or upload a file.', '⚠️');
 
-  // Capture current values for use inside callback (fixes undefined currentCourseId)
+  // Capture current values for use inside callback
   const targetCourseId = uploadCourseId;
   const currentViewCourseId = currentCourseId;
 
@@ -1051,13 +1051,13 @@ window.saveNote = async function() {
           hideLoading();
           updateStats();
           toast('Note saved! ✓');
-          // Return to appropriate course view
+          // Use global functions
           if (currentViewCourseId) {
-            showCourseDetail(currentViewCourseId);
+            window.showCourseDetail(currentViewCourseId);
           } else if (targetCourseId) {
-            showCourseDetail(targetCourseId);
+            window.showCourseDetail(targetCourseId);
           } else {
-            showCourseGrid();
+            window.showCourseGrid();
           }
         } catch (err) {
           console.error('Error saving note to Firestore:', err);
@@ -1091,17 +1091,91 @@ window.saveNote = async function() {
       updateStats();
       toast('Note saved! ✓');
       if (currentViewCourseId) {
-        showCourseDetail(currentViewCourseId);
+        window.showCourseDetail(currentViewCourseId);
       } else if (targetCourseId) {
-        showCourseDetail(targetCourseId);
+        window.showCourseDetail(targetCourseId);
       } else {
-        showCourseGrid();
+        window.showCourseGrid();
       }
     } catch (err) {
       console.error('Error saving note to Firestore:', err);
       hideLoading();
       toast('Failed to save note: ' + err.message, '❌');
     }
+  }
+};
+
+// ── Global navigation functions ────────────────────────────
+window.showCourseGrid = function() {
+  document.getElementById('view-courses-grid').style.display = '';
+  document.getElementById('view-course-detail').style.display = 'none';
+  document.getElementById('view-note-reader').style.display = 'none';
+  renderCourses();
+};
+
+window.showCourseDetail = function(courseId) {
+  currentCourseId = courseId;
+  const c = courses.find(x => x.id === courseId);
+  if (!c) return;
+  document.getElementById('view-courses-grid').style.display = 'none';
+  document.getElementById('view-course-detail').style.display = '';
+  document.getElementById('view-note-reader').style.display = 'none';
+
+  document.getElementById('cd-course-name').textContent = c.name;
+  document.getElementById('cd-course-meta').innerHTML = `<i class="fas fa-chalkboard-teacher"></i> ${esc(c.lecturer)}${c.desc ? ' · ' + esc(c.desc) : ''}`;
+
+  const uploadFn = `window.openUpload('${c.id}','${esc(c.name)}')`;
+  document.getElementById('cd-upload-btn').setAttribute('onclick', uploadFn);
+  document.getElementById('cd-upload-btn2').setAttribute('onclick', uploadFn);
+
+  const courseNotes = notes.filter(n => n.courseId === courseId);
+  const list = document.getElementById('cd-notes-list');
+  const empty = document.getElementById('cd-no-notes');
+
+  if (!courseNotes.length) {
+    list.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+  list.innerHTML = courseNotes.map(n => {
+    const icon = n.fileType === 'pdf' ? '📄' : n.fileType === 'pptx' ? '📊' : n.fileType === 'docx' ? '📝' : '📋';
+    const date = n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '';
+    const preview = n.content ? n.content.replace(/\n+/g,' ').slice(0,120) + (n.content.length > 120 ? '…' : '') : '';
+    return `<div class="card fade" style="padding:18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:border-color .2s;" onclick="window.openNoteReader('${n.id}')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+      <div style="font-size:26px;flex-shrink:0;margin-top:2px;">${icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-family:var(--font-display);font-size:15px;font-weight:600;margin-bottom:4px;">${esc(n.title)}</div>
+        <div style="font-size:11px;color:var(--muted);margin-bottom:6px;">${date ? date + ' · ' : ''}${n.content ? n.content.split(/\s+/).length + ' words' : ''}</div>
+        <div style="font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(preview)}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+        <button class="btn-icon" onclick="event.stopPropagation();window.openNoteReader('${n.id}')" style="font-size:12px;padding:6px 12px;"><i class="fas fa-book-open"></i> Read</button>
+        <button class="btn-danger" onclick="event.stopPropagation();window.deleteNoteAndBack('${n.id}')" style="font-size:12px;padding:6px 10px;"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+// ── Delete note and return to course detail ───────────────
+window.deleteNoteAndBack = async function(noteId) {
+  if (!confirm('Delete this note?')) return;
+  showLoading('Deleting…');
+  try {
+    await fsDel(`notes/${noteId}`);
+    notes = notes.filter(n => n.id !== noteId);
+    hideLoading();
+    updateStats();
+    toast('Note deleted.');
+    if (currentCourseId) {
+      window.showCourseDetail(currentCourseId);
+    } else {
+      window.showCourseGrid();
+    }
+  } catch (err) {
+    console.error('Error deleting note:', err);
+    hideLoading();
+    toast('Failed to delete note.', '❌');
   }
 };
 
@@ -1147,7 +1221,7 @@ window.deleteNote = async function(id) {
 };
 
 // ═══════════════════════════════════════════════════════════
-// BRAINX CHAT
+// BRAINX CHAT (unchanged)
 // ═══════════════════════════════════════════════════════════
 function loadChatNotes() {
   const con = document.getElementById('chat-notes');
@@ -1695,6 +1769,7 @@ window.openNoteReader = function(noteId) {
     contentEl.innerHTML = formatNoteContent(n.content);
   }
 
+  // Add Open Original File button if fileURL exists
   if (n.fileURL) {
     const button = document.createElement('div');
     button.style.marginTop = '24px';
