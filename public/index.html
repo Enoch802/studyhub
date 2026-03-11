@@ -18,7 +18,6 @@
   import { getFirestore, doc, setDoc, getDoc, collection, addDoc, getDocs, deleteDoc, query, where, updateDoc }
     from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-  // ── Firebase config ──────────────────────────────────────────
   const firebaseConfig = {
     apiKey: "AIzaSyBioZFtI6G-wzOHb0ljj3RVP_DDIfqkKwk",
     authDomain: "studyhub-87ac9.firebaseapp.com",
@@ -27,7 +26,6 @@
     messagingSenderId: "105165121582",
     appId: "1:105165121582:web:eb4a4780b8470cce0857bf"
   };
-  // ─────────────────────────────────────────────────────────────
 
   const app = initializeApp(firebaseConfig);
   window._auth = getAuth(app);
@@ -261,7 +259,7 @@
 <!-- ══════════════ AUTH SCREEN ══════════════ -->
 <div id="auth-screen" class="auth-bg">
   <!-- Theme toggle top right -->
-  <button class="theme-btn" onclick="toggleTheme()" style="position:fixed;top:16px;right:16px;z-index:999;" title="Toggle light/dark mode" id="theme-btn-auth">🌙</button>
+  <button class="theme-btn" onclick="window.toggleTheme()" style="position:fixed;top:16px;right:16px;z-index:999;" title="Toggle light/dark mode" id="theme-btn-auth">🌙</button>
 
   <div style="width:420px;max-width:100%;padding:16px;">
     <div class="text-center" style="margin-bottom:24px;">
@@ -276,18 +274,18 @@
     </div>
 
     <div style="display:flex;gap:8px;margin-bottom:20px;">
-      <button onclick="authTab('login')" id="tab-login" class="btn-primary" style="flex:1;">Login</button>
-      <button onclick="authTab('signup')" id="tab-signup" class="btn-ghost" style="flex:1;">Sign Up</button>
+      <button onclick="window.authTab('login')" id="tab-login" class="btn-primary" style="flex:1;">Login</button>
+      <button onclick="window.authTab('signup')" id="tab-signup" class="btn-ghost" style="flex:1;">Sign Up</button>
     </div>
 
     <!-- LOGIN -->
     <div id="form-login" class="card" style="padding:28px;">
       <h2 style="font-size:20px;margin-bottom:20px;">Welcome back 👋</h2>
-      <form onsubmit="doLogin();return false;" style="display:flex;flex-direction:column;gap:12px;">
-        <input id="login-email" type="email" placeholder="Email address" style="width:100%;">
+      <form onsubmit="window.doLogin();return false;" style="display:flex;flex-direction:column;gap:12px;">
+        <input id="login-email" type="email" placeholder="Email address" style="width:100%;" autocomplete="email">
         <div style="position:relative;">
-          <input id="login-pass" type="password" placeholder="Password" style="width:100%;padding-right:42px;">
-          <button type="button" onclick="togglePass('login-pass','eye-login')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;"><i id="eye-login" class="fas fa-eye"></i></button>
+          <input id="login-pass" type="password" placeholder="Password" style="width:100%;padding-right:42px;" autocomplete="current-password">
+          <button type="button" onclick="window.togglePass('login-pass','eye-login')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;"><i id="eye-login" class="fas fa-eye"></i></button>
         </div>
         <button type="submit" class="btn-primary" style="width:100%;padding:13px;font-size:15px;">Login →</button>
       </form>
@@ -297,18 +295,18 @@
     <!-- SIGNUP -->
     <div id="form-signup" class="card" style="padding:28px;display:none;">
       <h2 style="font-size:20px;margin-bottom:20px;">Create account 🚀</h2>
-      <form onsubmit="doSignup();return false;" style="display:flex;flex-direction:column;gap:12px;">
-        <input id="su-name"   type="text"  placeholder="Full name *"                style="width:100%;">
-        <input id="su-email"  type="email" placeholder="Email address *"            style="width:100%;">
-        <input id="su-school" type="text"  placeholder="School / University name *" style="width:100%;">
-        <input id="su-dept"   type="text"  placeholder="Department (optional)"      style="width:100%;">
+      <form onsubmit="window.doSignup();return false;" style="display:flex;flex-direction:column;gap:12px;">
+        <input id="su-name"   type="text"  placeholder="Full name *"                style="width:100%;" autocomplete="name">
+        <input id="su-email"  type="email" placeholder="Email address *"            style="width:100%;" autocomplete="email">
+        <input id="su-school" type="text"  placeholder="School / University name *" style="width:100%;" autocomplete="organization">
+        <input id="su-dept"   type="text"  placeholder="Department (optional)"      style="width:100%;" autocomplete="organization-title">
         <div style="position:relative;">
-          <input id="su-pass" type="password" placeholder="Password (min 6 chars) *" style="width:100%;padding-right:42px;">
-          <button type="button" onclick="togglePass('su-pass','eye-su1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;"><i id="eye-su1" class="fas fa-eye"></i></button>
+          <input id="su-pass" type="password" placeholder="Password (min 6 chars) *" style="width:100%;padding-right:42px;" autocomplete="new-password">
+          <button type="button" onclick="window.togglePass('su-pass','eye-su1')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;"><i id="eye-su1" class="fas fa-eye"></i></button>
         </div>
         <div style="position:relative;">
-          <input id="su-pass2" type="password" placeholder="Confirm password *" style="width:100%;padding-right:42px;">
-          <button type="button" onclick="togglePass('su-pass2','eye-su2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;"><i id="eye-su2" class="fas fa-eye"></i></button>
+          <input id="su-pass2" type="password" placeholder="Confirm password *" style="width:100%;padding-right:42px;" autocomplete="new-password">
+          <button type="button" onclick="window.togglePass('su-pass2','eye-su2')" style="position:absolute;right:12px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--muted);font-size:16px;padding:0;"><i id="eye-su2" class="fas fa-eye"></i></button>
         </div>
         <button type="submit" class="btn-primary" style="width:100%;padding:13px;font-size:15px;">Create Account →</button>
       </form>
@@ -321,15 +319,15 @@
 <div id="app" style="display:none;flex-direction:column;height:100vh;">
 
   <nav class="nav">
-    <button class="three-dots-btn" id="sidebar-toggle" onclick="toggleSidebar()" title="Toggle menu">
+    <button class="three-dots-btn" id="sidebar-toggle" onclick="window.toggleSidebar()" title="Toggle menu">
       <span></span><span></span><span></span>
     </button>
     <div class="logo grad-text" style="margin-left:12px;">StudyHub</div>
     <div style="flex:1;"></div>
     <div style="display:flex;align-items:center;gap:10px;">
-      <button class="theme-btn" id="theme-btn-app" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
+      <button class="theme-btn" id="theme-btn-app" onclick="window.toggleTheme()" title="Toggle light/dark mode">🌙</button>
       <div id="nav-user" style="font-size:13px;color:var(--muted);"></div>
-      <button class="btn-ghost" style="padding:8px 16px;font-size:13px;" onclick="doLogout()">
+      <button class="btn-ghost" style="padding:8px 16px;font-size:13px;" onclick="window.doLogout()">
         <i class="fas fa-sign-out-alt"></i> Logout
       </button>
     </div>
@@ -338,7 +336,7 @@
   <div style="display:flex;flex:1;overflow:hidden;margin-top:60px;">
 
     <!-- Sidebar overlay (click to close) -->
-    <div class="sidebar-overlay" id="sidebar-overlay" onclick="toggleSidebar()"></div>
+    <div class="sidebar-overlay" id="sidebar-overlay" onclick="window.toggleSidebar()"></div>
 
     <!-- Sidebar -->
     <aside class="sidebar collapsed" id="sidebar">
@@ -346,14 +344,14 @@
         <div id="sb-name"   style="font-size:14px;font-weight:600;font-family:var(--font-display);"></div>
         <div id="sb-school" style="font-size:12px;color:var(--muted);margin-top:2px;"></div>
       </div>
-      <button class="nav-btn active" id="nav-overview"  onclick="showSection('overview');closeSidebar()"> <i class="fas fa-th-large"></i>        Overview</button>
-      <button class="nav-btn"        id="nav-courses"   onclick="showSection('courses');closeSidebar()">  <i class="fas fa-graduation-cap"></i>  Courses</button>
-      <button class="nav-btn"        id="nav-notes"     onclick="showSection('notes');closeSidebar()">    <i class="fas fa-file-alt"></i>        My Notes</button>
-      <button class="nav-btn"        id="nav-brainx"    onclick="showSection('brainx');closeSidebar()">   <i class="fas fa-robot"></i>           BrainX Chat</button>
-      <button class="nav-btn"        id="nav-insights"  onclick="showSection('insights');closeSidebar()"> <i class="fas fa-brain"></i>           BrainX Insights</button>
-      <button class="nav-btn"        id="nav-tests"     onclick="showSection('tests');closeSidebar()">    <i class="fas fa-clipboard-check"></i> Tests</button>
-      <button class="nav-btn"        id="nav-profile"   onclick="showSection('profile');closeSidebar()">  <i class="fas fa-user"></i>            Profile</button>
-      <button class="nav-btn"        id="nav-games"     onclick="showSection('games');closeSidebar()">    <i class="fas fa-gamepad"></i>         Games</button>
+      <button class="nav-btn active" id="nav-overview"  onclick="window.showSection('overview');window.closeSidebar()"> <i class="fas fa-th-large"></i>        Overview</button>
+      <button class="nav-btn"        id="nav-courses"   onclick="window.showSection('courses');window.closeSidebar()">  <i class="fas fa-graduation-cap"></i>  Courses</button>
+      <button class="nav-btn"        id="nav-notes"     onclick="window.showSection('notes');window.closeSidebar()">    <i class="fas fa-file-alt"></i>        My Notes</button>
+      <button class="nav-btn"        id="nav-brainx"    onclick="window.showSection('brainx');window.closeSidebar()">   <i class="fas fa-robot"></i>           BrainX Chat</button>
+      <button class="nav-btn"        id="nav-insights"  onclick="window.showSection('insights');window.closeSidebar()"> <i class="fas fa-brain"></i>           BrainX Insights</button>
+      <button class="nav-btn"        id="nav-tests"     onclick="window.showSection('tests');window.closeSidebar()">    <i class="fas fa-clipboard-check"></i> Tests</button>
+      <button class="nav-btn"        id="nav-profile"   onclick="window.showSection('profile');window.closeSidebar()">  <i class="fas fa-user"></i>            Profile</button>
+      <button class="nav-btn"        id="nav-games"     onclick="window.showSection('games');window.closeSidebar()">    <i class="fas fa-gamepad"></i>         Games</button>
     </aside>
 
     <!-- Main -->
@@ -378,10 +376,10 @@
           </div>
         </div>
         <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;">
-          <button class="card" onclick="showSection('brainx')"   style="padding:20px;text-align:left;cursor:pointer;border:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='var(--accent)'"  onmouseout="this.style.borderColor='var(--border)'"><i class="fas fa-robot"          style="color:var(--accent);font-size:20px;margin-bottom:10px;display:block;"></i><div style="font-family:var(--font-display);font-weight:600;font-size:14px;">Ask BrainX</div></button>
-          <button class="card" onclick="showSection('tests')"    style="padding:20px;text-align:left;cursor:pointer;border:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'"><i class="fas fa-magic"          style="color:var(--accent2);font-size:20px;margin-bottom:10px;display:block;"></i><div style="font-family:var(--font-display);font-weight:600;font-size:14px;">Generate Test</div></button>
-          <button class="card" onclick="showSection('courses')"  style="padding:20px;text-align:left;cursor:pointer;border:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='var(--green)'"   onmouseout="this.style.borderColor='var(--border)'"><i class="fas fa-plus"           style="color:var(--green);font-size:20px;margin-bottom:10px;display:block;"></i><div style="font-family:var(--font-display);font-weight:600;font-size:14px;">Add Course</div></button>
-          <button class="card" onclick="showSection('insights')" style="padding:20px;text-align:left;cursor:pointer;border:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='var(--orange)'"  onmouseout="this.style.borderColor='var(--border)'"><i class="fas fa-brain"          style="color:var(--orange);font-size:20px;margin-bottom:10px;display:block;"></i><div style="font-family:var(--font-display);font-weight:600;font-size:14px;">Deep Dive</div></button>
+          <button class="card" onclick="window.showSection('brainx')"   style="padding:20px;text-align:left;cursor:pointer;border:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='var(--accent)'"  onmouseout="this.style.borderColor='var(--border)'"><i class="fas fa-robot"          style="color:var(--accent);font-size:20px;margin-bottom:10px;display:block;"></i><div style="font-family:var(--font-display);font-weight:600;font-size:14px;">Ask BrainX</div></button>
+          <button class="card" onclick="window.showSection('tests')"    style="padding:20px;text-align:left;cursor:pointer;border:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='var(--accent2)'" onmouseout="this.style.borderColor='var(--border)'"><i class="fas fa-magic"          style="color:var(--accent2);font-size:20px;margin-bottom:10px;display:block;"></i><div style="font-family:var(--font-display);font-weight:600;font-size:14px;">Generate Test</div></button>
+          <button class="card" onclick="window.showSection('courses')"  style="padding:20px;text-align:left;cursor:pointer;border:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='var(--green)'"   onmouseout="this.style.borderColor='var(--border)'"><i class="fas fa-plus"           style="color:var(--green);font-size:20px;margin-bottom:10px;display:block;"></i><div style="font-family:var(--font-display);font-weight:600;font-size:14px;">Add Course</div></button>
+          <button class="card" onclick="window.showSection('insights')" style="padding:20px;text-align:left;cursor:pointer;border:none;color:var(--text);transition:border-color .2s;" onmouseover="this.style.borderColor='var(--orange)'"  onmouseout="this.style.borderColor='var(--border)'"><i class="fas fa-brain"          style="color:var(--orange);font-size:20px;margin-bottom:10px;display:block;"></i><div style="font-family:var(--font-display);font-weight:600;font-size:14px;">Deep Dive</div></button>
         </div>
       </section>
 
@@ -390,8 +388,8 @@
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
           <h2 style="font-size:22px;">My Courses</h2>
           <div style="display:flex;gap:8px;">
-            <button class="btn-primary" onclick="openModal('modal-course')"><i class="fas fa-plus"></i> Add Course</button>
-            <button onclick="showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
+            <button class="btn-primary" onclick="window.openModal('modal-course')"><i class="fas fa-plus"></i> Add Course</button>
+            <button onclick="window.showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
           </div>
         </div>
         <div id="courses-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;"></div>
@@ -405,11 +403,11 @@
       <section id="sec-notes" style="display:none;" class="fade">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
           <h2 style="font-size:22px;">My Notes</h2>
-          <button onclick="showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
+          <button onclick="window.showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
         </div>
         <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Notes are uploaded per-course via the Upload Notes button on each course card.</p>
         <div style="margin-bottom:20px;">
-          <select id="notes-filter" onchange="renderNotes()" style="width:240px;">
+          <select id="notes-filter" onchange="window.renderNotes()" style="width:240px;">
             <option value="">All Courses</option>
           </select>
         </div>
@@ -437,7 +435,7 @@
                 <div style="font-family:var(--font-display);font-weight:600;font-size:15px;letter-spacing:-0.02em;">BrainX</div>
                 <div style="font-size:11px;color:var(--green);letter-spacing:0.02em;">● Online · AI Study Assistant</div>
               </div>
-              <button onclick="showSection('overview')" class="btn-icon">
+              <button onclick="window.showSection('overview')" class="btn-icon">
                 <i class="fas fa-times" style="font-size:12px;"></i> Close
               </button>
             </div>
@@ -450,8 +448,8 @@
               </div>
             </div>
             <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;background:var(--surface);">
-              <input id="chat-input" type="text" placeholder="Ask BrainX anything..." style="flex:1;font-size:15px;" onkeydown="if(event.key==='Enter')sendChat()">
-              <button class="btn-primary" onclick="sendChat()" style="padding:10px 20px;"><i class="fas fa-paper-plane"></i></button>
+              <input id="chat-input" type="text" placeholder="Ask BrainX anything..." style="flex:1;font-size:15px;" onkeydown="if(event.key==='Enter')window.sendChat()">
+              <button class="btn-primary" onclick="window.sendChat()" style="padding:10px 20px;"><i class="fas fa-paper-plane"></i></button>
             </div>
           </div>
           <div style="display:flex;flex-direction:column;overflow:hidden;background:var(--surface);">
@@ -465,13 +463,13 @@
       <section id="sec-insights" style="display:none;max-width:820px;" class="fade">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
           <h2 style="font-size:22px;">BrainX Insights</h2>
-          <button onclick="showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
+          <button onclick="window.showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
         </div>
         <p style="color:var(--muted);font-size:13px;margin-bottom:20px;">Deep AI analysis — summaries, key concepts, exam questions, memory techniques and more.</p>
         <div class="card" style="padding:24px;margin-bottom:20px;">
           <div style="display:flex;gap:8px;margin-bottom:16px;">
-            <button onclick="insTab('paste')" id="ins-tab-paste" class="btn-primary"  style="font-size:13px;padding:7px 16px;">Paste Text</button>
-            <button onclick="insTab('note')"  id="ins-tab-note"  class="btn-ghost"    style="font-size:13px;padding:7px 16px;">From Notes</button>
+            <button onclick="window.insTab('paste')" id="ins-tab-paste" class="btn-primary"  style="font-size:13px;padding:7px 16px;">Paste Text</button>
+            <button onclick="window.insTab('note')"  id="ins-tab-note"  class="btn-ghost"    style="font-size:13px;padding:7px 16px;">From Notes</button>
           </div>
           <div id="ins-paste-area">
             <textarea id="insights-text" rows="7" placeholder="Paste your study material here..." style="width:100%;resize:vertical;"></textarea>
@@ -479,7 +477,7 @@
           <div id="ins-note-area" style="display:none;">
             <select id="insights-note-select" style="width:100%;"><option value="">Select a note...</option></select>
           </div>
-          <button class="btn-primary" onclick="runInsights()" style="width:100%;padding:13px;margin-top:14px;font-size:15px;">
+          <button class="btn-primary" onclick="window.runInsights()" style="width:100%;padding:13px;margin-top:14px;font-size:15px;">
             <i class="fas fa-brain"></i> Generate Insights
           </button>
         </div>
@@ -494,13 +492,13 @@
         <div id="test-setup">
           <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
             <h2 style="font-size:22px;">AI Test Generator</h2>
-            <button onclick="showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
+            <button onclick="window.showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
           </div>
           <div class="card" style="padding:28px;">
             <div style="display:flex;flex-direction:column;gap:16px;">
               <div>
                 <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px;">Select Course</label>
-                <select id="test-course" onchange="loadTestNotes()" style="width:100%;"></select>
+                <select id="test-course" onchange="window.loadTestNotes()" style="width:100%;"></select>
               </div>
               <div>
                 <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px;">Select Notes to test on</label>
@@ -530,7 +528,7 @@
                   <input id="test-count" type="number" value="5" min="1" max="20" style="width:100%;">
                 </div>
               </div>
-              <button class="btn-primary" onclick="startTest()" style="padding:13px;font-size:15px;">
+              <button class="btn-primary" onclick="window.startTest()" style="padding:13px;font-size:15px;">
                 <i class="fas fa-magic"></i> Generate & Start Test
               </button>
             </div>
@@ -545,9 +543,9 @@
           </div>
           <div class="card" id="test-question-box" style="padding:28px;min-height:200px;"></div>
           <div style="display:flex;justify-content:space-between;margin-top:14px;">
-            <button class="btn-ghost" id="btn-prev-q" onclick="prevQ()" disabled>← Prev</button>
-            <button class="btn-primary" id="btn-next-q" onclick="nextQ()">Next →</button>
-            <button class="btn-primary" id="btn-submit-q" onclick="submitTest()" style="display:none;background:linear-gradient(135deg,var(--green),#16a34a);">Submit Test ✓</button>
+            <button class="btn-ghost" id="btn-prev-q" onclick="window.prevQ()" disabled>← Prev</button>
+            <button class="btn-primary" id="btn-next-q" onclick="window.nextQ()">Next →</button>
+            <button class="btn-primary" id="btn-submit-q" onclick="window.submitTest()" style="display:none;background:linear-gradient(135deg,var(--green),#16a34a);">Submit Test ✓</button>
           </div>
         </div>
         <div id="test-results" style="display:none;text-align:center;">
@@ -555,7 +553,7 @@
             <div style="font-size:56px;font-family:var(--font-display);font-weight:800;" id="result-pct" class="grad-text">0%</div>
             <div style="margin:12px 0;font-size:16px;font-weight:600;" id="result-label"></div>
             <div style="color:var(--muted);font-size:13px;margin-bottom:24px;" id="result-detail"></div>
-            <button class="btn-primary" onclick="resetTest()">Try Another Test</button>
+            <button class="btn-primary" onclick="window.resetTest()">Try Another Test</button>
           </div>
         </div>
       </section>
@@ -564,7 +562,7 @@
       <section id="sec-profile" style="display:none;max-width:520px;" class="fade">
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
           <h2 style="font-size:22px;">My Profile</h2>
-          <button onclick="showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
+          <button onclick="window.showSection('overview')" style="background:rgba(255,255,255,0.07);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:7px 16px;cursor:pointer;font-size:13px;display:flex;align-items:center;gap:6px;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.07)'"><i class="fas fa-times"></i> Close</button>
         </div>
         <div class="card" style="padding:28px;display:flex;flex-direction:column;gap:14px;">
           <div>
@@ -583,7 +581,7 @@
             <label style="font-size:13px;color:var(--muted);display:block;margin-bottom:6px;">Department <span style="opacity:.5;">(optional)</span></label>
             <input id="p-dept" type="text" style="width:100%;">
           </div>
-          <button class="btn-primary" onclick="saveProfile()" style="padding:12px;">Save Changes</button>
+          <button class="btn-primary" onclick="window.saveProfile()" style="padding:12px;">Save Changes</button>
         </div>
       </section>
 
@@ -594,7 +592,7 @@
             <h2 class="section-title">Word Scramble</h2>
             <p style="font-size:13px;color:var(--muted);margin-top:4px;">BrainX picks a word, you unscramble it — letter by letter.</p>
           </div>
-          <button onclick="showSection('overview')" class="btn-icon"><i class="fas fa-times" style="font-size:12px;"></i> Close</button>
+          <button onclick="window.showSection('overview')" class="btn-icon"><i class="fas fa-times" style="font-size:12px;"></i> Close</button>
         </div>
 
         <!-- Loading State -->
@@ -610,7 +608,7 @@
           <div style="font-size:32px;margin-bottom:12px;">⚡</div>
           <div style="font-family:var(--font-display);font-size:16px;font-weight:600;margin-bottom:8px;">BrainX is offline</div>
           <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Word Scramble is powered by BrainX AI. Connect your API to play.</p>
-          <button class="btn-ghost" onclick="wsStart()" style="font-size:13px;">Try Again</button>
+          <button class="btn-ghost" onclick="window.wsStart()" style="font-size:13px;">Try Again</button>
         </div>
 
         <!-- Game Board -->
@@ -649,8 +647,8 @@
 
             <!-- Actions -->
             <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:center;">
-              <button class="btn-ghost" onclick="wsClearAnswer()" style="font-size:13px;padding:9px 18px;"><i class="fas fa-undo" style="font-size:11px;"></i> Clear</button>
-              <button class="btn-primary" onclick="wsSubmit()" id="ws-submit-btn" style="padding:9px 24px;font-size:13px;"><i class="fas fa-check" style="font-size:11px;"></i> Submit</button>
+              <button class="btn-ghost" onclick="window.wsClearAnswer()" style="font-size:13px;padding:9px 18px;"><i class="fas fa-undo" style="font-size:11px;"></i> Clear</button>
+              <button class="btn-primary" onclick="window.wsSubmit()" id="ws-submit-btn" style="padding:9px 24px;font-size:13px;"><i class="fas fa-check" style="font-size:11px;"></i> Submit</button>
             </div>
 
             <!-- Feedback message -->
@@ -659,7 +657,7 @@
             <!-- Show Answer (appears after 3 failed attempts) -->
             <div id="ws-reveal-zone" style="display:none;flex-direction:column;align-items:center;gap:14px;">
               <div style="padding:12px 24px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-family:var(--font-mono);font-size:18px;font-weight:500;letter-spacing:0.1em;" id="ws-answer-reveal"></div>
-              <button class="btn-primary" onclick="wsNextWord()" style="font-size:13px;padding:10px 28px;">Next Word <i class="fas fa-arrow-right" style="font-size:11px;"></i></button>
+              <button class="btn-primary" onclick="window.wsNextWord()" style="font-size:13px;padding:10px 28px;">Next Word <i class="fas fa-arrow-right" style="font-size:11px;"></i></button>
             </div>
           </div>
         </div>
@@ -670,7 +668,7 @@
           <h3 style="font-family:var(--font-display);font-size:1.3rem;margin-bottom:8px;">Round Complete</h3>
           <p style="color:var(--muted);font-size:13.5px;margin-bottom:6px;">You solved <span id="ws-final-correct" style="color:var(--green);font-weight:600;"></span> out of <span id="ws-final-total" style="font-weight:600;"></span> words.</p>
           <p style="font-size:22px;font-weight:700;color:var(--accent);font-family:var(--font-display);margin-bottom:24px;" id="ws-final-score"></p>
-          <button class="btn-primary" onclick="wsStart()" style="padding:11px 32px;">Play Again</button>
+          <button class="btn-primary" onclick="window.wsStart()" style="padding:11px 32px;">Play Again</button>
         </div>
       </section>
 
@@ -681,15 +679,15 @@
 <!-- ══════════════ MODALS ══════════════ -->
 <div class="modal-bg" id="modal-course">
   <div class="card" style="width:460px;padding:28px;position:relative;">
-    <button onclick="closeModal('modal-course')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
+    <button onclick="window.closeModal('modal-course')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
     <h3 style="font-size:18px;margin-bottom:20px;">Add New Course</h3>
     <div style="display:flex;flex-direction:column;gap:12px;">
       <input id="c-name"     type="text" placeholder="Course name *"              style="width:100%;">
       <input id="c-lecturer" type="text" placeholder="Lecturer / Professor name *" style="width:100%;">
       <textarea id="c-desc"  placeholder="Course description (optional)" rows="3"  style="width:100%;resize:none;"></textarea>
       <div style="display:flex;gap:10px;margin-top:4px;">
-        <button class="btn-ghost"   onclick="closeModal('modal-course')" style="flex:1;">Cancel</button>
-        <button class="btn-primary" onclick="saveCourse()"               style="flex:1;">Save Course</button>
+        <button class="btn-ghost"   onclick="window.closeModal('modal-course')" style="flex:1;">Cancel</button>
+        <button class="btn-primary" onclick="window.saveCourse()"               style="flex:1;">Save Course</button>
       </div>
     </div>
   </div>
@@ -697,7 +695,7 @@
 
 <div class="modal-bg" id="modal-upload">
   <div class="card" style="width:520px;padding:28px;position:relative;max-height:90vh;overflow-y:auto;">
-    <button onclick="closeModal('modal-upload')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
+    <button onclick="window.closeModal('modal-upload')" style="position:absolute;top:16px;right:16px;background:none;border:none;color:var(--muted);font-size:18px;cursor:pointer;">✕</button>
     <h3 style="font-size:18px;margin-bottom:6px;">Upload Notes</h3>
     <p style="font-size:13px;color:var(--muted);margin-bottom:20px;">Course: <span id="upload-course-name" style="color:var(--accent);font-weight:600;"></span></p>
     <input id="upload-note-title" type="text" placeholder="Note title *" style="width:100%;margin-bottom:12px;">
@@ -705,20 +703,20 @@
       <i class="fas fa-cloud-upload-alt" style="font-size:28px;color:var(--muted);margin-bottom:10px;display:block;"></i>
       <p style="color:var(--muted);font-size:14px;">Drag & drop or <span style="color:var(--accent);">browse files</span></p>
       <p style="color:var(--muted);font-size:12px;margin-top:6px;">PDF, PPTX, DOCX, TXT</p>
-      <input type="file" id="file-input" accept=".pdf,.pptx,.docx,.txt,.md" style="display:none;" onchange="handleFileSelect(this)">
+      <input type="file" id="file-input" accept=".pdf,.pptx,.docx,.txt,.md" style="display:none;" onchange="window.handleFileSelect(this)">
     </div>
     <div id="file-preview" style="display:none;margin-top:12px;padding:10px 14px;border-radius:8px;background:var(--surface2);align-items:center;gap:10px;">
       <i class="fas fa-file" style="color:var(--accent);"></i>
       <span id="file-name" style="font-size:13px;flex:1;"></span>
-      <button onclick="clearFile()" style="background:none;border:none;color:var(--muted);cursor:pointer;">✕</button>
+      <button onclick="window.clearFile()" style="background:none;border:none;color:var(--muted);cursor:pointer;">✕</button>
     </div>
     <div style="margin-top:14px;">
       <label style="font-size:12px;color:var(--muted);display:block;margin-bottom:6px;">Or paste note content directly (required for AI features):</label>
       <textarea id="upload-text" placeholder="Paste note text here..." rows="5" style="width:100%;resize:none;"></textarea>
     </div>
     <div style="display:flex;gap:10px;margin-top:16px;">
-      <button class="btn-ghost"   onclick="closeModal('modal-upload')" style="flex:1;">Cancel</button>
-      <button class="btn-primary" onclick="saveNote()"                 style="flex:1;"><i class="fas fa-save"></i> Save Note</button>
+      <button class="btn-ghost"   onclick="window.closeModal('modal-upload')" style="flex:1;">Cancel</button>
+      <button class="btn-primary" onclick="window.saveNote()"                 style="flex:1;"><i class="fas fa-save"></i> Save Note</button>
     </div>
   </div>
 </div>
@@ -740,7 +738,7 @@
 // ═══════════════════════════════════════════════════════════
 // AI — calls /api/chat (Vercel backend, key never exposed)
 // ═══════════════════════════════════════════════════════════
-async function callAI(messages, max_tokens = 2000) {
+window.callAI = async function(messages, max_tokens = 2000) {
   const res = await fetch('/api/chat', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -752,7 +750,7 @@ async function callAI(messages, max_tokens = 2000) {
   }
   const data = await res.json();
   return data.text;
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 // STATE
@@ -781,13 +779,14 @@ waitForFB(() => {
 // ═══════════════════════════════════════════════════════════
 // AUTH
 // ═══════════════════════════════════════════════════════════
-function authTab(tab) {
+window.authTab = function(tab) {
   document.getElementById('form-login').style.display  = tab==='login'  ? 'block' : 'none';
   document.getElementById('form-signup').style.display = tab==='signup' ? 'block' : 'none';
   document.getElementById('tab-login').className  = tab==='login'  ? 'btn-primary' : 'btn-ghost';
   document.getElementById('tab-signup').className = tab==='signup' ? 'btn-primary' : 'btn-ghost';
-}
-async function doLogin() {
+};
+
+window.doLogin = async function() {
   const email = document.getElementById('login-email').value.trim();
   const pass  = document.getElementById('login-pass').value;
   const err   = document.getElementById('login-err');
@@ -797,8 +796,9 @@ async function doLogin() {
     showLoading('Logging in…');
     await window._fbFns.signInWithEmailAndPassword(window._auth, email, pass);
   } catch(e) { hideLoading(); showErr(err, friendlyErr(e.code)); }
-}
-async function doSignup() {
+};
+
+window.doSignup = async function() {
   const name=document.getElementById('su-name').value.trim(),
         email=document.getElementById('su-email').value.trim(),
         school=document.getElementById('su-school').value.trim(),
@@ -817,11 +817,13 @@ async function doSignup() {
     await updateProfile(cred.user, { displayName: name });
     await setDoc(doc(window._db,'users',cred.user.uid), { name, email, school, dept, createdAt: Date.now() });
   } catch(e) { hideLoading(); showErr(err, friendlyErr(e.code)); }
-}
-async function doLogout() {
+};
+
+window.doLogout = async function() {
   await window._fbFns.signOut(window._auth);
   currentUser=null; courses=[]; notes=[]; testHistory=[];
-}
+};
+
 function showErr(el,msg){el.textContent=msg;el.style.display='block';}
 function friendlyErr(code){
   if(!code) return 'Something went wrong.';
@@ -872,7 +874,8 @@ function showApp() {
   updateStats();
   showSection('overview');
 }
-function toggleSidebar() {
+
+window.toggleSidebar = function() {
   const sidebar = document.getElementById('sidebar');
   const overlay = document.getElementById('sidebar-overlay');
   const btn = document.getElementById('sidebar-toggle');
@@ -886,14 +889,15 @@ function toggleSidebar() {
     overlay.classList.add('show');
     btn.classList.add('open');
   }
-}
-function closeSidebar() {
+};
+
+window.closeSidebar = function() {
   document.getElementById('sidebar').classList.add('collapsed');
   document.getElementById('sidebar-overlay').classList.remove('show');
   document.getElementById('sidebar-toggle').classList.remove('open');
-}
+};
 
-function showSection(name) {
+window.showSection = function(name) {
   ['overview','courses','notes','brainx','insights','tests','profile','games'].forEach(s=>{
     const sec = document.getElementById('sec-'+s); if(sec) sec.style.display='none';
     const b=document.getElementById('nav-'+s); if(b) b.classList.remove('active');
@@ -907,7 +911,8 @@ function showSection(name) {
   if(name==='tests')    populateTestCourses();
   if(name==='profile')  fillProfile();
   if(name==='games')    wsStart();
-}
+};
+
 function updateStats() {
   document.getElementById('stat-courses').textContent = courses.length;
   document.getElementById('stat-notes').textContent   = notes.length;
@@ -925,20 +930,21 @@ function renderCourses() {
     <div class="card fade" style="padding:22px;">
       <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;">
         <div style="width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:18px;">📚</div>
-        <button class="btn-danger" onclick="deleteCourse('${c.id}')"><i class="fas fa-trash"></i></button>
+        <button class="btn-danger" onclick="window.deleteCourse('${c.id}')"><i class="fas fa-trash"></i></button>
       </div>
       <div style="font-family:var(--font-display);font-size:16px;font-weight:700;margin-bottom:4px;">${esc(c.name)}</div>
       <div style="font-size:12px;color:var(--accent);margin-bottom:4px;"><i class="fas fa-chalkboard-teacher"></i> ${esc(c.lecturer)}</div>
       <div style="font-size:12px;color:var(--muted);margin-bottom:16px;">${esc(c.desc||'')}</div>
       <div style="display:flex;justify-content:space-between;align-items:center;">
         <span style="font-size:12px;color:var(--muted);">${notes.filter(n=>n.courseId===c.id).length} note(s)</span>
-        <button class="btn-primary" style="font-size:12px;padding:6px 14px;" onclick="openUpload('${c.id}','${esc(c.name)}')">
+        <button class="btn-primary" style="font-size:12px;padding:6px 14px;" onclick="window.openUpload('${c.id}','${esc(c.name)}')">
           <i class="fas fa-upload"></i> Upload Notes
         </button>
       </div>
     </div>`).join('');
 }
-async function saveCourse() {
+
+window.saveCourse = async function() {
   const name=document.getElementById('c-name').value.trim(),
         lecturer=document.getElementById('c-lecturer').value.trim(),
         desc=document.getElementById('c-desc').value.trim();
@@ -949,8 +955,9 @@ async function saveCourse() {
   closeModal('modal-course');
   ['c-name','c-lecturer','c-desc'].forEach(i=>document.getElementById(i).value='');
   hideLoading(); updateStats(); renderCourses(); toast('Course added! ✓');
-}
-async function deleteCourse(id) {
+};
+
+window.deleteCourse = async function(id) {
   if(!confirm('Delete this course and all its notes?')) return;
   showLoading('Deleting…');
   await fsDel(`courses/${id}`);
@@ -958,20 +965,21 @@ async function deleteCourse(id) {
   courses=courses.filter(c=>c.id!==id);
   notes=notes.filter(n=>n.courseId!==id);
   hideLoading(); updateStats(); renderCourses(); toast('Course deleted.');
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 // NOTES / UPLOAD
 // ═══════════════════════════════════════════════════════════
-function openUpload(courseId, courseName) {
+window.openUpload = function(courseId, courseName) {
   uploadCourseId=courseId; selectedFile=null;
   document.getElementById('upload-course-name').textContent=courseName;
   document.getElementById('upload-note-title').value='';
   document.getElementById('upload-text').value='';
   document.getElementById('file-preview').style.display='none';
   openModal('modal-upload');
-}
-function handleFileSelect(input) {
+};
+
+window.handleFileSelect = function(input) {
   const file=input.files[0]; if(!file) return;
   selectedFile=file;
   document.getElementById('file-name').textContent=file.name;
@@ -981,21 +989,29 @@ function handleFileSelect(input) {
     r.onload=e=>{document.getElementById('upload-text').value=e.target.result;};
     r.readAsText(file);
   }
-}
-function clearFile() {
+};
+
+window.clearFile = function() {
   selectedFile=null;
   document.getElementById('file-input').value='';
   document.getElementById('file-preview').style.display='none';
-}
-const dz=document.getElementById('drop-zone');
-dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag-over');});
-dz.addEventListener('dragleave',()=>dz.classList.remove('drag-over'));
-dz.addEventListener('drop',e=>{
-  e.preventDefault();dz.classList.remove('drag-over');
-  const file=e.dataTransfer.files[0];
-  if(file){document.getElementById('file-input').files=e.dataTransfer.files;handleFileSelect(document.getElementById('file-input'));}
+};
+
+// Drop zone
+document.addEventListener('DOMContentLoaded', function() {
+  const dz = document.getElementById('drop-zone');
+  if (dz) {
+    dz.addEventListener('dragover', e=>{e.preventDefault();dz.classList.add('drag-over');});
+    dz.addEventListener('dragleave', ()=>dz.classList.remove('drag-over'));
+    dz.addEventListener('drop', e=>{
+      e.preventDefault(); dz.classList.remove('drag-over');
+      const file=e.dataTransfer.files[0];
+      if(file){document.getElementById('file-input').files=e.dataTransfer.files; handleFileSelect(document.getElementById('file-input'));}
+    });
+  }
 });
-async function saveNote() {
+
+window.saveNote = async function() {
   const title=document.getElementById('upload-note-title').value.trim();
   const textVal=document.getElementById('upload-text').value.trim();
   if(!title) return toast('Note title is required.','⚠️');
@@ -1011,14 +1027,16 @@ async function saveNote() {
   notes.push({id,uid:uid(),courseId:uploadCourseId,title,content,fileName,fileType});
   closeModal('modal-upload');
   hideLoading(); updateStats(); toast('Note saved! ✓');
-}
+};
+
 function populateNotesFilter() {
   const sel=document.getElementById('notes-filter'), val=sel.value;
   sel.innerHTML='<option value="">All Courses</option>';
   courses.forEach(c=>sel.innerHTML+=`<option value="${c.id}">${esc(c.name)}</option>`);
   sel.value=val;
 }
-function renderNotes() {
+
+window.renderNotes = function() {
   const filter=document.getElementById('notes-filter').value;
   const list=document.getElementById('notes-list'), empty=document.getElementById('no-notes');
   const filtered=filter?notes.filter(n=>n.courseId===filter):notes;
@@ -1034,17 +1052,18 @@ function renderNotes() {
         <div style="font-size:12px;color:var(--accent);margin-bottom:6px;">${c?esc(c.name):'Unknown'}</div>
         <div style="font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:600px;">${esc(n.content.slice(0,160))}${n.content.length>160?'…':''}</div>
       </div>
-      <button class="btn-danger" onclick="deleteNote('${n.id}')"><i class="fas fa-trash"></i></button>
+      <button class="btn-danger" onclick="window.deleteNote('${n.id}')"><i class="fas fa-trash"></i></button>
     </div>`;
   }).join('');
-}
-async function deleteNote(id) {
+};
+
+window.deleteNote = async function(id) {
   if(!confirm('Delete this note?')) return;
   showLoading('Deleting…');
   await fsDel(`notes/${id}`);
   notes=notes.filter(n=>n.id!==id);
   hideLoading(); updateStats(); renderNotes(); toast('Note deleted.');
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 // BRAINX CHAT
@@ -1053,12 +1072,13 @@ function loadChatNotes() {
   const con=document.getElementById('chat-notes');
   if(!notes.length){con.innerHTML='<p style="font-size:13px;color:var(--muted);padding:8px;">No notes yet.</p>';return;}
   con.innerHTML=notes.map(n=>`
-    <div class="card2" style="padding:10px 12px;cursor:pointer;transition:border-color .2s;" onclick="analyzeNote('${n.id}')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
+    <div class="card2" style="padding:10px 12px;cursor:pointer;transition:border-color .2s;" onclick="window.analyzeNote('${n.id}')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
       <div style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(n.title)}</div>
       <div style="font-size:11px;color:var(--muted);">Click to analyze</div>
     </div>`).join('');
 }
-async function sendChat() {
+
+window.sendChat = async function() {
   const input=document.getElementById('chat-input');
   const msg=input.value.trim(); if(!msg) return;
   input.value='';
@@ -1067,7 +1087,7 @@ async function sendChat() {
   const typing=appendTyping();
   try {
     const reply=await callAI([
-      {role:'user',content: BRAINX_SYSTEM + '\n\nYou are now in study assistant mode. Help the student with clear, deep, and engaging answers. Break down complex topics, give examples, and always encourage the student to think critically.'},
+      {role:'user',content: 'You are BrainX, a helpful study assistant. Provide clear, deep answers with examples.'},
       ...chatHistory
     ]);
     typing.remove();
@@ -1077,12 +1097,14 @@ async function sendChat() {
     typing.remove();
     appendChatMsg('⚠️ Error: '+e.message,'ai');
   }
-}
-async function analyzeNote(id) {
+};
+
+window.analyzeNote = async function(id) {
   const n=notes.find(x=>x.id===id); if(!n) return;
   document.getElementById('chat-input').value=`Please analyze and summarize this note titled "${n.title}":\n\n${n.content}`;
   await sendChat();
-}
+};
+
 function appendChatMsg(text,who) {
   const con=document.getElementById('chat-messages');
   const d=document.createElement('div');
@@ -1095,6 +1117,7 @@ function appendChatMsg(text,who) {
   }
   con.appendChild(d); con.scrollTop=con.scrollHeight; return d;
 }
+
 function appendTyping() {
   const con=document.getElementById('chat-messages');
   const d=document.createElement('div');
@@ -1107,12 +1130,13 @@ function appendTyping() {
 // ═══════════════════════════════════════════════════════════
 // BRAINX INSIGHTS
 // ═══════════════════════════════════════════════════════════
-function insTab(tab) {
+window.insTab = function(tab) {
   document.getElementById('ins-paste-area').style.display=tab==='paste'?'block':'none';
   document.getElementById('ins-note-area').style.display =tab==='note' ?'block':'none';
   document.getElementById('ins-tab-paste').className=tab==='paste'?'btn-primary':'btn-ghost';
   document.getElementById('ins-tab-note').className =tab==='note' ?'btn-primary':'btn-ghost';
-}
+};
+
 function populateInsightsSelect() {
   const sel=document.getElementById('insights-note-select');
   sel.innerHTML='<option value="">Select a note...</option>';
@@ -1121,7 +1145,8 @@ function populateInsightsSelect() {
     sel.innerHTML+=`<option value="${n.id}">[${c?esc(c.name):'?'}] ${esc(n.title)}</option>`;
   });
 }
-async function runInsights() {
+
+window.runInsights = async function() {
   let content='';
   const noteArea=document.getElementById('ins-note-area');
   if(noteArea.style.display!=='none') {
@@ -1147,7 +1172,8 @@ Study material:\n${content}`}], 2000);
     document.getElementById('insights-loading').style.display='none';
     document.getElementById('insights-output').innerHTML=`<div class="card" style="padding:20px;color:var(--red);">⚠️ ${esc(e.message)}</div>`;
   }
-}
+};
+
 function renderInsights(d) {
   const out=document.getElementById('insights-output');
   const sec=(title,icon,html)=>`<div class="card insight-card fade" style="padding:20px;"><div style="font-family:var(--font-display);font-size:14px;font-weight:700;margin-bottom:12px;">${icon} ${title}</div>${html}</div>`;
@@ -1174,7 +1200,8 @@ function populateTestCourses() {
   document.getElementById('test-notes-check').innerHTML='<span style="color:var(--muted);font-size:13px;">Select a course first</span>';
   showTestPanel('test-setup');
 }
-function loadTestNotes() {
+
+window.loadTestNotes = function() {
   const cid=document.getElementById('test-course').value;
   const box=document.getElementById('test-notes-check');
   if(!cid){box.innerHTML='<span style="color:var(--muted);font-size:13px;">Select a course first</span>';return;}
@@ -1185,8 +1212,9 @@ function loadTestNotes() {
       <input type="checkbox" value="${n.id}" class="test-note-cb" style="width:15px;height:15px;accent-color:var(--accent);">
       <span style="font-size:13px;">${esc(n.title)}</span>
     </label>`).join('');
-}
-async function startTest() {
+};
+
+window.startTest = async function() {
   const cid=document.getElementById('test-course').value;
   const cbs=[...document.querySelectorAll('.test-note-cb:checked')];
   const type=document.getElementById('test-type').value;
@@ -1210,7 +1238,8 @@ Study material:\n${material}`}],2000);
     showTestPanel('test-active');
     renderTestQ();
   } catch(e) { hideLoading(); toast('Error: '+e.message,'⚠️'); }
-}
+};
+
 function renderTestQ() {
   const q=currentTest.questions[testQIdx], total=currentTest.questions.length;
   document.getElementById('test-prog-text').textContent=`Question ${testQIdx+1} of ${total}`;
@@ -1224,7 +1253,7 @@ function renderTestQ() {
     html+=`<div style="display:flex;flex-direction:column;gap:10px;">`;
     q.options.forEach((opt,i)=>{
       const sel=currentTest.answers[testQIdx]===i;
-      html+=`<label class="opt-label ${sel?'selected':''}" onclick="selectOpt(${i})">
+      html+=`<label class="opt-label ${sel?'selected':''}" onclick="window.selectOpt(${i})">
         <div style="width:28px;height:28px;border-radius:50%;border:2px solid ${sel?'var(--accent)':'var(--border)'};background:${sel?'rgba(79,142,255,.15)':'transparent'};display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">${'ABCD'[i]}</div>
         <span style="font-size:14px;">${esc(opt.replace(/^[A-D]\.\s*/,''))}</span>
       </label>`;
@@ -1236,10 +1265,12 @@ function renderTestQ() {
   }
   box.innerHTML=html;
 }
-function selectOpt(i){currentTest.answers[testQIdx]=i;renderTestQ();}
-function prevQ(){if(testQIdx>0){testQIdx--;renderTestQ();}}
-function nextQ(){if(testQIdx<currentTest.questions.length-1){testQIdx++;renderTestQ();}}
-async function submitTest() {
+
+window.selectOpt = function(i){currentTest.answers[testQIdx]=i;renderTestQ();};
+window.prevQ = function(){if(testQIdx>0){testQIdx--;renderTestQ();}};
+window.nextQ = function(){if(testQIdx<currentTest.questions.length-1){testQIdx++;renderTestQ();}};
+
+window.submitTest = async function() {
   showLoading('Scoring…');
   const qs=currentTest.questions;
   let correct=0,scored=0;
@@ -1252,8 +1283,10 @@ async function submitTest() {
   document.getElementById('result-label').textContent=pct>=80?'Excellent! 🏆':pct>=60?'Good job! 👍':'Keep studying! 💪';
   document.getElementById('result-detail').textContent=scored?`${correct} of ${scored} MCQ correct`:'Subjective test submitted.';
   showTestPanel('test-results');
-}
-function resetTest(){currentTest=null;testQIdx=0;showTestPanel('test-setup');populateTestCourses();}
+};
+
+window.resetTest = function(){currentTest=null;testQIdx=0;showTestPanel('test-setup');populateTestCourses();};
+
 function showTestPanel(id){['test-setup','test-active','test-results'].forEach(p=>document.getElementById(p).style.display='none');document.getElementById(id).style.display='';}
 
 // ═══════════════════════════════════════════════════════════
@@ -1265,7 +1298,8 @@ function fillProfile(){
   document.getElementById('p-school').value=userProfile.school||'';
   document.getElementById('p-dept').value  =userProfile.dept||'';
 }
-async function saveProfile(){
+
+window.saveProfile = async function(){
   const name=document.getElementById('p-name').value.trim(),
         school=document.getElementById('p-school').value.trim(),
         dept=document.getElementById('p-dept').value.trim();
@@ -1278,49 +1312,55 @@ async function saveProfile(){
   document.getElementById('sb-school').textContent=school;
   document.getElementById('nav-user').textContent =name;
   hideLoading(); toast('Profile saved! ✓');
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 // MODALS / TOAST / LOADING / UTILS
 // ═══════════════════════════════════════════════════════════
-function openModal(id) {document.getElementById(id).classList.add('open');}
-function closeModal(id){document.getElementById(id).classList.remove('open');}
+window.openModal = function(id) {document.getElementById(id).classList.add('open');};
+window.closeModal = function(id){document.getElementById(id).classList.remove('open');};
 document.querySelectorAll('.modal-bg').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open');}));
 let toastTimer;
-function toast(msg,icon='✓'){
+window.toast = function(msg,icon='✓'){
   document.getElementById('toast-msg').textContent=msg;
   document.getElementById('toast-icon').textContent=icon;
   const el=document.getElementById('toast');
   el.classList.add('show');
   clearTimeout(toastTimer);
   toastTimer=setTimeout(()=>el.classList.remove('show'),3200);
-}
-function showLoading(msg='Loading…'){document.getElementById('load-text').textContent=msg;document.getElementById('loading-overlay').style.display='flex';}
-function hideLoading(){document.getElementById('loading-overlay').style.display='none';}
+};
+window.showLoading = function(msg='Loading…'){document.getElementById('load-text').textContent=msg;document.getElementById('loading-overlay').style.display='flex';};
+window.hideLoading = function(){document.getElementById('loading-overlay').style.display='none';};
+
 function esc(s){if(!s)return'';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
 function fmtAI(text){
   return text
-    .replace(/```([\s\S]*?)```/g,'<pre style="background:var(--surface2);padding:12px;border-radius:8px;overflow-x:auto;font-size:12px;margin:8px 0;"><code>$1</code></pre>')
-    .replace(/`([^`]+)`/g,'<code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:12px;">$1</code>')
-    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
-    .replace(/^### (.*)/gm,'<div style="font-family:var(--font-display);font-weight:700;font-size:15px;margin:12px 0 4px;">$1</div>')
-    .replace(/^## (.*)/gm,'<div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin:14px 0 6px;">$1</div>')
-    .replace(/^- (.*)/gm,'<li style="margin-left:16px;margin-bottom:3px;">$1</li>')
-    .replace(/\n/g,'<br>');
+    .replace(/```([\s\S]*?)```/g, '<pre style="background:var(--surface2);padding:12px;border-radius:8px;overflow-x:auto;font-size:12px;margin:8px 0;"><code>$1</code></pre>')
+    .replace(/`([^`]+)`/g, '<code style="background:var(--surface2);padding:2px 6px;border-radius:4px;font-size:12px;">$1</code>')
+    .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+    .replace(/^### (.*)/gm, '<div style="font-family:var(--font-display);font-weight:700;font-size:15px;margin:12px 0 4px;">$1</div>')
+    .replace(/^## (.*)/gm, '<div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin:14px 0 6px;">$1</div>')
+    .replace(/^- (.*)/gm, '<li style="margin-left:16px;margin-bottom:3px;">$1</li>')
+    .replace(/\n/g, '<br>');
 }
-insTab('paste');
+
+// Initialize tabs
+window.insTab('paste');
 
 // ═══════════════════════════════════════════════════════════
 // THEME TOGGLE
 // ═══════════════════════════════════════════════════════════
-function toggleTheme() {
+window.toggleTheme = function() {
   const isLight = document.body.classList.toggle('light');
   const icon = isLight ? '☀️' : '🌙';
   ['theme-btn-auth','theme-btn-app'].forEach(id => {
     const b = document.getElementById(id); if(b) b.textContent = icon;
   });
   localStorage.setItem('sh-theme', isLight ? 'light' : 'dark');
-}
+};
+
+// Initialize theme on load
 (function() {
   if(localStorage.getItem('sh-theme') === 'light') {
     document.body.classList.add('light');
@@ -1367,7 +1407,7 @@ setInterval(rotateQuote, 9000);
 // ═══════════════════════════════════════════════════════════
 // PASSWORD VISIBILITY TOGGLE
 // ═══════════════════════════════════════════════════════════
-function togglePass(inputId, iconId) {
+window.togglePass = function(inputId, iconId) {
   const input = document.getElementById(inputId);
   const icon  = document.getElementById(iconId);
   if(!input) return;
@@ -1377,13 +1417,11 @@ function togglePass(inputId, iconId) {
     icon.classList.toggle('fa-eye', !show);
     icon.classList.toggle('fa-eye-slash', show);
   }
-}
+};
 
 // ═══════════════════════════════════════════════════════════
 // WORD SCRAMBLE — BrainX AI Game
 // ═══════════════════════════════════════════════════════════
-const BRAINX_SYSTEM = `You are BrainX — the most advanced, intelligent, and intuitive version of yourself. You think with razor-sharp clarity, adapt instantly, and always give the most helpful, creative, and insightful response possible. You never settle for average. Whether tutoring, playing games, or solving problems, you operate at peak performance and push students to grow.`;
-
 let wsWords = [];
 let wsCurrentIdx = 0;
 let wsCurrentWord = '';
@@ -1395,7 +1433,7 @@ let wsCorrect = 0;
 const WS_MAX_ATTEMPTS = 3;
 const WS_MAX_WORDS = 10;
 
-async function wsStart() {
+window.wsStart = async function() {
   // Show loading, hide all others
   document.getElementById('ws-loading').style.display = 'block';
   document.getElementById('ws-board').style.display = 'none';
@@ -1407,7 +1445,7 @@ async function wsStart() {
   try {
     const resp = await callAI([{
       role: 'user',
-      content: BRAINX_SYSTEM + `\n\nGenerate exactly 10 English vocabulary words suitable for university students. Mix difficulty levels (some medium, some hard). For each word also provide a short one-sentence hint/definition.\n\nRespond ONLY with a valid JSON array, no markdown, no explanation. Format:\n[{"word":"example","hint":"A thing that serves to illustrate a point"},...]`
+      content: `You are BrainX. Generate exactly 10 English vocabulary words suitable for university students. Mix difficulty levels (some medium, some hard). For each word also provide a short one-sentence hint/definition.\n\nRespond ONLY with a valid JSON array, no markdown, no explanation. Format:\n[{"word":"example","hint":"A thing that serves to illustrate a point"},...]`
     }], 800);
 
     let parsed;
@@ -1428,7 +1466,7 @@ async function wsStart() {
     document.getElementById('ws-loading').style.display = 'none';
     document.getElementById('ws-error').style.display = 'block';
   }
-}
+};
 
 function wsLoadWord() {
   const item = wsWords[wsCurrentIdx];
@@ -1505,15 +1543,15 @@ function wsRemoveLetter(answerIdx) {
   wsRenderAnswer();
 }
 
-function wsClearAnswer() {
+window.wsClearAnswer = function() {
   wsAnswer.forEach(item => { if(item) wsScrambled[item.scramIdx] = item.letter; });
   wsAnswer = [];
   wsRenderLetters();
   wsRenderAnswer();
   document.getElementById('ws-feedback').textContent = '';
-}
+};
 
-function wsSubmit() {
+window.wsSubmit = function() {
   if(wsAnswer.length < wsCurrentWord.length) {
     document.getElementById('ws-feedback').textContent = 'Place all letters first.';
     document.getElementById('ws-feedback').style.color = 'var(--muted)';
@@ -1552,13 +1590,13 @@ function wsSubmit() {
       wsClearAnswer();
     }
   }
-}
+};
 
-function wsNextWord() {
+window.wsNextWord = function() {
   wsCurrentIdx++;
   if(wsCurrentIdx >= wsWords.length) wsFinish();
   else wsLoadWord();
-}
+};
 
 function wsFinish() {
   document.getElementById('ws-board').style.display = 'none';
