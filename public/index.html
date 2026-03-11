@@ -1194,7 +1194,7 @@ function showCourseDetail(courseId) {
   list.innerHTML = courseNotes.map(n => {
     const icon = n.fileType === 'pdf' ? '📄' : n.fileType === 'pptx' ? '📊' : n.fileType === 'docx' ? '📝' : '📋';
     const date = n.createdAt ? new Date(n.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '';
-    const preview = n.content ? n.content.replace(/\n+/g,' ').slice(0,120) + (n.content.length > 120 ? '\u2026' : '') : '';
+    const preview = n.content ? n.content.split('\n').join(' ').slice(0,120) + (n.content.length > 120 ? '...' : '') : '';
     return `<div class="card fade" style="padding:18px;display:flex;align-items:flex-start;gap:14px;cursor:pointer;transition:border-color .2s;" onclick="openNoteReader('${n.id}')" onmouseover="this.style.borderColor='var(--accent)'" onmouseout="this.style.borderColor='var(--border)'">
       <div style="font-size:26px;flex-shrink:0;margin-top:2px;">${icon}</div>
       <div style="flex:1;min-width:0;">
@@ -1252,8 +1252,8 @@ function formatNoteContent(text) {
     .replace(/^[-*] (.+)$/gm, '<li style="margin-bottom:5px;color:var(--text2);">$1</li>')
     .replace(/^\d+\. (.+)$/gm, '<li style="margin-bottom:5px;color:var(--text2);">$1</li>')
     .replace(/^---+$/gm, '<hr style="border:none;border-top:1px solid var(--border);margin:20px 0;">')
-    .replace(/\n\n/g, '</p><p style="color:var(--text2);margin-bottom:12px;">')
-    .replace(/\n/g, '<br>');
+    .split('\n\n').join('</p><p style="color:var(--text2);margin-bottom:12px;">')
+    .split('\n').join('<br>');
   return '<p style="color:var(--text2);margin-bottom:12px;">' + s + '</p>';
 }
 
@@ -1850,7 +1850,7 @@ function fmtAI(text){
     .replace(/^### (.*)/gm,'<div style="font-family:var(--font-display);font-weight:700;font-size:15px;margin:12px 0 4px;">$1</div>')
     .replace(/^## (.*)/gm,'<div style="font-family:var(--font-display);font-weight:700;font-size:16px;margin:14px 0 6px;">$1</div>')
     .replace(/^- (.*)/gm,'<li style="margin-left:16px;margin-bottom:3px;">$1</li>')
-    .replace(/\n/g,'<br>');
+    .split('\n').join('<br>');
 }
 insTab('topic');
 
