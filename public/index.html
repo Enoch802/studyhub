@@ -1258,12 +1258,23 @@ function notesOpenNote(noteId) {
 
   if(hasFile) {
     document.getElementById('notes-pdf-filename').textContent = n.fileName || n.title;
-    document.getElementById('notes-pdf-link').href = n.fileUrl;
+    // Build inline URL for Cloudinary
+    let inlineUrl = n.fileUrl;
+    if (inlineUrl && inlineUrl.includes('cloudinary.com')) {
+      inlineUrl = inlineUrl.replace('/upload/', '/upload/fl_inline/');
+    }
+    document.getElementById('notes-pdf-link').href = inlineUrl;
     document.getElementById('notes-pdf-link').innerHTML = '<i class="fas fa-external-link-alt"></i> Open in New Tab';
     document.getElementById('notes-pdf-loading').style.display = 'block';
-    document.getElementById('notes-pdf-loading-link').href = n.fileUrl;
-    // Load PDF directly in iframe — browser renders it natively
-    document.getElementById('notes-pdf-frame').src = n.fileUrl;
+    document.getElementById('notes-pdf-loading-link').href = inlineUrl;
+    // Force Cloudinary to serve inline (not as download) using fl_inline transformation
+    // Also convert /raw/upload/ to proper inline URL
+    let pdfSrc = n.fileUrl;
+    if (pdfSrc.includes('cloudinary.com')) {
+      // Insert fl_inline flag to force browser-viewable delivery
+      pdfSrc = pdfSrc.replace('/upload/', '/upload/fl_inline/');
+    }
+    document.getElementById('notes-pdf-frame').src = pdfSrc;
     document.getElementById('notes-pdf-viewer').style.display = 'block';
     if(hasText) {
       document.getElementById('notes-text-body').textContent = n.content;
