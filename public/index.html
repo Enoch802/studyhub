@@ -1262,9 +1262,16 @@ function notesOpenNote(noteId) {
     document.getElementById('notes-pdf-link').innerHTML = '<i class="fas fa-external-link-alt"></i> Open in New Tab';
     document.getElementById('notes-pdf-loading').style.display = 'block';
     document.getElementById('notes-pdf-loading-link').href = n.fileUrl;
-    // Google Docs viewer renders any PDF/DOCX inline without CORS or iframe-block issues
-    const viewerUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(n.fileUrl) + '&embedded=true';
-    document.getElementById('notes-pdf-frame').src = viewerUrl;
+    // Use PDF.js CDN to render PDFs directly in the browser — works with any URL
+    const isPdf = n.fileType === 'pdf' || n.fileUrl.toLowerCase().includes('.pdf') || n.fileName?.toLowerCase().endsWith('.pdf');
+    if (isPdf) {
+      const pdfJsUrl = 'https://mozilla.github.io/pdf.js/web/viewer.html?file=' + encodeURIComponent(n.fileUrl);
+      document.getElementById('notes-pdf-frame').src = pdfJsUrl;
+    } else {
+      // For DOCX/other: use Google Docs viewer as fallback
+      const viewerUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(n.fileUrl) + '&embedded=true';
+      document.getElementById('notes-pdf-frame').src = viewerUrl;
+    }
     document.getElementById('notes-pdf-viewer').style.display = 'block';
     if(hasText) {
       document.getElementById('notes-text-body').textContent = n.content;
