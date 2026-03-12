@@ -1269,18 +1269,24 @@ function notesOpenNote(noteId) {
     document.getElementById('notes-pdf-viewer').style.display = 'block';
     document.getElementById('notes-pdf-loading').style.display = 'block';
 
-    // Fetch as blob — bypasses all Cloudinary CORS/header restrictions
-    fetch(n.fileUrl)
-      .then(res => { if(!res.ok) throw new Error(res.status); return res.blob(); })
-      .then(blob => {
-        const blobUrl = URL.createObjectURL(blob);
-        const frame = document.getElementById('notes-pdf-frame');
-        frame.src = blobUrl;
-        frame.style.display = 'block';
-        frame.onload = () => { document.getElementById('notes-pdf-loading').style.display = 'none'; };
+    // Route through Vercel proxy to bypass Cloudinary CORS
+    const proxyUrl = '/api/pdf?url=' + encodeURIComponent(n.fileUrl);
+    const frame = document.getElementById('notes-pdf-frame');
+    // Show frame immediately — hide loading after 2s regardless
+    frame.src = proxyUrl;
+    frame.style.display = 'block';
+    // Check if proxy responded OK before hiding loader
+    fetch(proxyUrl, { method: 'HEAD' })
+      .then(r => {
+        document.getElementById('notes-pdf-loading').style.display = 'none';
+        if (!r.ok) {
+          frame.style.display = 'none';
+          document.getElementById('notes-pdf-error').style.display = 'block';
+        }
       })
       .catch(() => {
         document.getElementById('notes-pdf-loading').style.display = 'none';
+        frame.style.display = 'none';
         document.getElementById('notes-pdf-error').style.display = 'block';
       });
 
