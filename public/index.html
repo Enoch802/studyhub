@@ -1085,7 +1085,7 @@ dz.addEventListener('drop', e => {
 // 2. Go to Settings → Upload → Upload Presets → Add preset
 //    Set name = studyhub_notes, Signing mode = Unsigned → Save
 const CLOUDINARY_CLOUD  = 'dl0mvkewm';   // ← paste your cloud name here
-const CLOUDINARY_PRESET = 'studyhub_notes';    // ← your unsigned preset name
+const CLOUDINARY_PRESET = 'studyhub_unsigned';    // ← your unsigned preset name
 
 async function uploadToCloudinary(file) {
   return new Promise((resolve, reject) => {
