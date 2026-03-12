@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>StudyHub — AI-Powered Learning</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📚</text></svg>">
 <script src="https://cdn.tailwindcss.com?plugins=forms,typography"></script>
 <script>tailwind.config = { corePlugins: { preflight: false } }</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1079,8 +1080,12 @@ dz.addEventListener('drop', e => {
 
 // ── Cloudinary upload ──────────────────────────────────────
 // FREE account — sign up at cloudinary.com, get your cloud_name and upload_preset
-const CLOUDINARY_CLOUD = 'studyhub-app';       // ← replace with your Cloudinary cloud name
-const CLOUDINARY_PRESET = 'studyhub_notes';    // ← replace with your unsigned upload preset
+// ── CLOUDINARY CONFIG ─────────────────────────────────────
+// 1. Go to cloudinary.com → Dashboard → copy your Cloud Name
+// 2. Go to Settings → Upload → Upload Presets → Add preset
+//    Set name = studyhub_notes, Signing mode = Unsigned → Save
+const CLOUDINARY_CLOUD  = 'YOUR_CLOUD_NAME';   // ← paste your cloud name here
+const CLOUDINARY_PRESET = 'studyhub_notes';    // ← your unsigned preset name
 
 async function uploadToCloudinary(file) {
   return new Promise((resolve, reject) => {
@@ -1862,10 +1867,7 @@ window.wsStart           = wsStart;
 window.wsSubmit          = wsSubmit;
 window.wsClearAnswer     = wsClearAnswer;
 window.wsNextWord        = wsNextWord;
-window.showCourseGrid    = showCourseGrid;
-window.showCourseDetail  = showCourseDetail;
-window.openNoteReader    = openNoteReader;
-window.deleteNoteAndBack = deleteNoteAndBack;
+// showCourseGrid, showCourseDetail, openNoteReader, deleteNoteAndBack removed (unused)
 </script>
 </body>
 </html>
