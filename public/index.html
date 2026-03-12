@@ -461,12 +461,15 @@
                   <span class="dot"></span><span class="dot"></span><span class="dot"></span>
                   <span style="margin-left:4px;">Loading PDF...</span>
                 </div>
-                <p style="margin-top:10px;font-size:12px;">If it doesn't load, click <a id="notes-pdf-loading-link" href="#" target="_blank" style="color:var(--accent);">Open in New Tab</a></p>
               </div>
-              <iframe id="notes-pdf-frame" src="" style="width:100%;height:82vh;border:none;display:none;"
-                onload="this.style.display='block';document.getElementById('notes-pdf-loading').style.display='none';"
-                onerror="document.getElementById('notes-pdf-loading').innerHTML='<p style=&quot;color:var(--red)&quot;>Could not display PDF inline. <a href=&quot;'+this.src+'&quot; target=&quot;_blank&quot; style=&quot;color:var(--accent)&quot;>Click here to open it.</a></p>';">
-              </iframe>
+              <div id="notes-pdf-error" style="display:none;padding:40px;text-align:center;">
+                <i class="fas fa-file-pdf" style="font-size:48px;color:#e74c3c;margin-bottom:16px;display:block;"></i>
+                <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">PDF cannot be displayed inline in this browser.</p>
+                <a id="notes-pdf-error-link" href="#" target="_blank" class="btn-primary" style="text-decoration:none;padding:12px 28px;font-size:14px;">
+                  <i class="fas fa-external-link-alt"></i> Open PDF in New Tab
+                </a>
+              </div>
+              <iframe id="notes-pdf-frame" src="" style="width:100%;height:82vh;border:none;display:none;"></iframe>
             </div>
           </div>
 
@@ -1247,26 +1250,40 @@ function notesOpenNote(noteId) {
   document.getElementById('notes-open-title').textContent = n.title;
   document.getElementById('notes-open-course').textContent = c ? c.name : '';
 
-  // Hide all content areas first
+  // Reset all panels
   document.getElementById('notes-pdf-viewer').style.display = 'none';
   document.getElementById('notes-text-content').style.display = 'none';
   document.getElementById('notes-no-content').style.display = 'none';
-  document.getElementById('notes-pdf-frame').style.display = 'block';
+  document.getElementById('notes-pdf-frame').style.display = 'none';
+  document.getElementById('notes-pdf-loading').style.display = 'none';
+  document.getElementById('notes-pdf-error').style.display = 'none';
 
+  const badPrefix = s => !s || s.startsWith('[PDF attached:') || s.startsWith('[File uploaded:') || s.startsWith('[File:');
   const hasFile = n.fileUrl && n.fileUrl.length > 0;
-  const badPrefix = s => s.startsWith('[PDF attached:') || s.startsWith('[File uploaded:') || s.startsWith('[File:');
   const hasText = n.content && !badPrefix(n.content);
 
   if(hasFile) {
-    document.getElementById('notes-pdf-filename').textContent = n.fileName || n.title;
     document.getElementById('notes-pdf-link').href = n.fileUrl;
-    document.getElementById('notes-pdf-link').innerHTML = '<i class="fas fa-external-link-alt"></i> Open in New Tab';
-    document.getElementById('notes-pdf-loading').style.display = 'block';
-    document.getElementById('notes-pdf-loading-link').href = n.fileUrl;
-    // Use Google Docs viewer — most reliable way to embed any public PDF/DOCX
-    const gdocsUrl = 'https://docs.google.com/viewer?url=' + encodeURIComponent(n.fileUrl) + '&embedded=true';
-    document.getElementById('notes-pdf-frame').src = gdocsUrl;
+    document.getElementById('notes-pdf-error-link').href = n.fileUrl;
+    document.getElementById('notes-pdf-filename').textContent = n.fileName || n.title;
     document.getElementById('notes-pdf-viewer').style.display = 'block';
+    document.getElementById('notes-pdf-loading').style.display = 'block';
+
+    // Fetch as blob — bypasses all Cloudinary CORS/header restrictions
+    fetch(n.fileUrl)
+      .then(res => { if(!res.ok) throw new Error(res.status); return res.blob(); })
+      .then(blob => {
+        const blobUrl = URL.createObjectURL(blob);
+        const frame = document.getElementById('notes-pdf-frame');
+        frame.src = blobUrl;
+        frame.style.display = 'block';
+        frame.onload = () => { document.getElementById('notes-pdf-loading').style.display = 'none'; };
+      })
+      .catch(() => {
+        document.getElementById('notes-pdf-loading').style.display = 'none';
+        document.getElementById('notes-pdf-error').style.display = 'block';
+      });
+
     if(hasText) {
       document.getElementById('notes-text-body').textContent = n.content;
       document.getElementById('notes-text-content').style.display = 'block';
@@ -1280,7 +1297,6 @@ function notesOpenNote(noteId) {
 
   notesShowView('content');
 }
-
 // Keep these for compatibility with other parts of the code
 function populateNotesFilter() {}
 function renderNotes() { renderNotesCourses(); }
